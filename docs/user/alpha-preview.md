@@ -1,8 +1,20 @@
 # Alpha Preview
 
-This mode is for exploratory testing and fast feedback, not formal release validation.
+The alpha preview helper is for exploratory and manual UX testing. It does not change RC scope.
 
-## Start from a fresh clone
+## Scope reminder
+
+Release scope remains:
+- push-to-talk flow
+- optional `--preview` confirmation flow
+- tmux + Codex CLI transport
+
+## Supported platform statement
+
+- Official support: TUXEDO OS 24.04 LTS
+- Best effort: Ubuntu 24.04-compatible Linux environments
+
+## Start from source checkout
 
 ```bash
 sudo apt update
@@ -20,30 +32,25 @@ make install-dev
 make alpha-preview
 ```
 
-What this does:
+This helper:
 - verifies `tmux` and `arecord`
 - runs `dialogos --doctor`
 - prints active config/log paths
-- launches Dialogos with GPU-oriented alpha defaults:
-  - `--model small`
-  - `--device cuda`
-  - `--compute-type float16`
-  - `--language auto`
+- starts Dialogos with higher-quality defaults (`small`, `cuda`, `float16`, `auto`)
 
-If CUDA runtime is not available, Dialogos falls back to CPU `int8` automatically.
+If CUDA runtime is unavailable, Dialogos falls back to CPU `int8`.
 
-Default alpha flow is direct send after transcription (no confirm prompt).
-Use `--preview` when you want to review/edit/retry/skip before sending.
+Default helper flow runs direct-send mode. Add `--preview` to require explicit action before send.
 
 ## Override defaults
 
-You can override by passing CLI args:
+CLI override example:
 
 ```bash
 ./scripts/alpha_preview.sh --model medium --language en --preview
 ```
 
-Or set environment overrides:
+Environment overrides:
 
 ```bash
 export DIALOGOS_ALPHA_MODEL=medium
@@ -53,17 +60,15 @@ export DIALOGOS_ALPHA_LANGUAGE=auto
 make alpha-preview
 ```
 
-To avoid Hugging Face anonymous-download warnings and improve model download reliability, set a token:
+## Optional authenticated model downloads
 
 ```bash
 export HF_TOKEN=hf_xxx
-# optional alpha-scoped passthrough if you do not want to export HF_TOKEN globally:
+# optional alpha-scoped passthrough
 export DIALOGOS_ALPHA_HF_TOKEN=hf_xxx
 ```
 
-`HF_TOKEN` is only used for model downloads from Hugging Face Hub. Transcription still runs locally.
-
-Dry run without launching the interactive loop:
+## Dry run without interactive loop
 
 ```bash
 make alpha-preview-no-run
@@ -71,31 +76,21 @@ make alpha-preview-no-run
 
 ## Reset local alpha state
 
-Use this when you want to replay first-run behavior (picker + remembered target setup).
-
 ```bash
 make alpha-reset
 ```
 
-This removes local files if present:
+This removes local state files if present:
 - `$XDG_CONFIG_HOME/dialogos/config.toml` (fallback `~/.config/dialogos/config.toml`)
 - `$XDG_STATE_HOME/dialogos/turns.jsonl` (fallback `~/.local/state/dialogos/turns.jsonl`)
 
-## Known limitations in alpha preview
-- Turn logs are plain local JSONL and may include transcript text.
-- No always-on voice mode.
-- No spoken assistant replies (TTS).
-- Linux + tmux workflow only.
+## Known issue note: submit timing in Codex tmux pane
 
-## Known issue note: Codex submit timing
+Dialogos mitigates missed submits by splitting text send and Enter into separate tmux operations with a short delay.
 
-Some environments using older Dialogos sender behavior may inject transcript text into Codex
-without submitting the prompt until Enter is pressed manually.
-
-Dialogos now mitigates this by sending text and submit key as two tmux operations with a short delay.
-If you still observe the issue, capture your Codex CLI version, tmux version, and terminal emulator
-and open a bug report with reproduction steps.
-
-## Give feedback
-
-Use the lightweight template in [Feedback Template](feedback-template.md).
+If the symptom persists (text appears but prompt does not submit), include these details in bug reports:
+- OS version
+- terminal emulator
+- tmux version
+- Codex CLI version
+- exact reproduction steps

@@ -4,16 +4,41 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dialogos"
-version = "0.1.0"
-description = "Voice bridge for Linux users to talk to Codex."
+version = "0.1.0rc1"
+description = "Linux push-to-talk voice bridge to Codex running in tmux."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = ["faster-whisper>=1.1.0"]
+keywords = ["voice", "codex", "tmux", "speech-to-text", "linux"]
+authors = [{ name = "Dialogos contributors" }]
+maintainers = [{ name = "Dialogos maintainers" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: User Interfaces",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+[project.urls]
+Homepage = "https://github.com/dothackerman/dialogos"
+Repository = "https://github.com/dothackerman/dialogos"
+Issues = "https://github.com/dothackerman/dialogos/issues"
+Changelog = "https://github.com/dothackerman/dialogos/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
+  "build>=1.2.2",
   "mypy>=1.11.0",
   "pytest>=8.3.0",
   "ruff>=0.6.0",
+  "twine>=5.1.1",
 ]
 
 [project.scripts]

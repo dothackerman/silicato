@@ -1,13 +1,34 @@
 # Quickstart
 
-## 1) Install system packages (Ubuntu / TUXEDO OS)
+## 1) Platform and baseline
+
+Official support target:
+- TUXEDO OS 24.04 LTS (Ubuntu noble base)
+
+Best effort target:
+- Ubuntu 24.04-compatible Linux environments
+
+Validated RC baseline:
+- Python 3.12.3
+- tmux 3.4
+- Codex CLI 0.107.0
+
+## 2) Install required system packages
 
 ```bash
 sudo apt update
 sudo apt install -y alsa-utils ffmpeg python3-venv tmux
 ```
 
-## 2) Create virtual environment and install
+## 3) Install Dialogos
+
+### Option A: RC install from TestPyPI (`0.1.0rc1`)
+
+```bash
+pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' dialogos==0.1.0rc1
+```
+
+### Option B: install from source checkout
 
 ```bash
 python3 -m venv .venv
@@ -17,71 +38,41 @@ make install-dev
 make hooks
 ```
 
-## Optional) Enable authenticated model downloads
-
-If you see Hugging Face anonymous-download warnings, set a token:
-
-```bash
-export HF_TOKEN=hf_xxx
-```
-
-## 3) Fastest way to try Dialogos (alpha preview)
-
-```bash
-make alpha-preview
-```
-
-If you only want checks and environment info (no interactive run):
-
-```bash
-make alpha-preview-no-run
-```
-
-To reset local alpha state and replay first-run behavior:
-
-```bash
-make alpha-reset
-```
-
-## 4) Manual run path
-
-Start a tmux session with Codex:
+## 4) Start Codex in tmux
 
 ```bash
 tmux new -s codex
-# start Codex in that tmux session
+# run codex in this tmux session
 ```
 
-Run Dialogos manually:
+## 5) Verify runtime dependencies
 
 ```bash
-dialogos --model small --language auto
-# or
-python3 -m dialogos --model small --language auto
+dialogos --doctor
 ```
 
-First run behavior:
-- Dialogos opens an indexed tmux pane picker
-- You choose by number
-- Selected target is remembered in config by default
+## 6) Run Dialogos
 
-Controls (normal mode):
-- Press `Enter` to start recording
-- Press `Enter` to stop recording
-- Transcript is sent to Codex directly (no confirm prompt)
-- Dialogos submits automatically (text send + short delayed Enter in tmux)
-- If an older Dialogos version injects text but does not submit, press Enter once manually
+Normal mode (direct send):
 
-Preview mode:
+```bash
+dialogos
+```
+
+Preview mode (explicit action before send):
 
 ```bash
 dialogos --preview
 ```
 
-Preview mode enables confirmation controls before send:
-- `y=send`, `e=edit`, `r=retry`, `s=skip`, `q=quit`
+Preview controls:
+- `y=send`
+- `e=edit`
+- `r=retry`
+- `s=skip`
+- `q=quit`
 
-## 5) Target overrides
+## 7) Target selection and overrides
 
 ```bash
 # one-off explicit target
@@ -95,15 +86,18 @@ export DIALOGOS_TMUX_TARGET=codex:0.1
 dialogos
 ```
 
-## 6) Diagnostics
+Resolution order:
+1. `--tmux-target`
+2. `DIALOGOS_TMUX_TARGET`
+3. remembered config target
+4. interactive picker
+
+## 8) Optional model download auth
+
+If Hugging Face warns about anonymous download limits:
 
 ```bash
-dialogos --doctor
+export HF_TOKEN=hf_xxx
 ```
 
-## 7) Quality gate before changes
-
-```bash
-source .venv/bin/activate
-make gate
-```
+This token is only used for model downloads.

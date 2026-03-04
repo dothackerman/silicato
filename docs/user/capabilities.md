@@ -1,25 +1,31 @@
 # Capabilities
 
-## Milestone 1 feature set (runtime behavior)
-- Local push-to-talk speech capture (`arecord`)
-- Local transcription via Whisper (`faster-whisper`)
-- Language options: `de`, `en`, `auto`
-- tmux mandatory transport (`tmux send-keys`)
-- Interactive indexed tmux pane picker for first-time setup
-- Remembered tmux target with CLI/env override support
-- Send controls:
-  - Normal mode: direct send after transcription (no confirm prompt)
-  - Preview mode: confirmation flow with `y=send`, `e=edit`, `r=retry`, `s=skip`, `q=quit`
-- Local JSONL turn logging
-- Runtime diagnostics (`--doctor`)
+## RC1 scope (`0.1.0rc1`)
 
-## Alpha preview helpers
-- `make alpha-preview`: run diagnostics and start Dialogos with safe defaults
-- `make alpha-preview-no-run`: diagnostics only
-- `make alpha-reset`: remove local config/log state for first-run retests
+In scope:
+- Push-to-talk speech capture with Enter start/stop
+- Local transcription via `faster-whisper`
+- Language selection: `de`, `en`, `auto`
+- tmux pane selection and persisted default target
+- Normal mode direct send after transcription
+- Preview mode (`--preview`) with `send/edit/retry/skip/quit`
+- Local JSONL turn logs
+- Runtime diagnostics (`dialogos --doctor`)
 
-## Out of scope right now
-- Always-on voice mode with silence segmentation
+## Required runtime model
+
+- Linux terminal workflow
+- Codex CLI running inside tmux
+- Dialogos injects transcript text into selected tmux pane and submits the prompt
+
+## Out of scope for RC1
+
+- Always-on mode with silence segmentation
 - Spoken assistant replies (TTS)
-- Cloud-only dependencies
-- Telemetry/usage metrics
+- Non-Linux platform support
+- Cloud-only runtime dependencies
+
+## Support policy
+
+- Official support: TUXEDO OS 24.04 LTS
+- Best effort: Ubuntu 24.04-compatible Linux environments

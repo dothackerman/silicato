@@ -1,0 +1,80 @@
+name: Bug report
+description: Report a reproducible Dialogos bug
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please include exact steps and environment details so we can reproduce.
+  - type: input
+    id: version
+    attributes:
+      label: Dialogos version
+      description: Example: 0.1.0rc1
+      placeholder: 0.1.0rc1
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS and version
+      description: Required
+      placeholder: TUXEDO OS 24.04.4 LTS
+    validations:
+      required: true
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal emulator
+      description: Required
+      placeholder: GNOME Terminal 3.52
+    validations:
+      required: true
+  - type: input
+    id: tmux
+    attributes:
+      label: tmux version
+      description: Required
+      placeholder: tmux 3.4
+    validations:
+      required: true
+  - type: input
+    id: codex_cli
+    attributes:
+      label: Codex CLI version
+      description: Required
+      placeholder: codex-cli 0.107.0
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Exact reproduction steps
+      description: Required. Include every command/key press needed.
+      placeholder: |
+        1. Start tmux session...
+        2. Run codex...
+        3. Run dialogos...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or --doctor output
+      render: shell
+    validations:
+      required: false

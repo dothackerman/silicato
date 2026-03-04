@@ -1,120 +1,133 @@
 # Dialogos
 
-Dialogos creates a local voice channel from Linux microphone input to a selected Codex tmux pane:
-1. Push-to-talk capture
-2. Local transcription with `faster-whisper`
-3. Full confirm control before send
-4. Send confirmed text to tmux
-5. Persist target/config and JSONL turn logs
+Dialogos is a Linux voice bridge from push-to-talk microphone input to a selected Codex tmux pane.
 
-Milestone status: **Milestone 3 agent-first hardening in progress** (runtime behavior from Milestone 1 remains unchanged).
+Current release candidate: `0.1.0rc1`.
 
-## Why the name "Dialogos"?
+## Supported Platforms
 
-"Dialogos" comes from the Greek root associated with dialogue and exchange.
-The project goal matches that meaning: a natural conversational channel between human speech and Codex.
+- Official support: TUXEDO OS 24.04 LTS (Ubuntu noble base)
+- Best effort: Ubuntu 24.04-compatible Linux environments
 
-## Alpha preview (recommended for now)
+Validated baseline for this RC:
+- OS: TUXEDO OS 24.04.4 LTS
+- Python: 3.12.3
+- tmux: 3.4
+- Codex CLI: 0.107.0
 
-From a fresh clone:
+## Release Scope
+
+`0.1.0rc1` is intentionally limited to the current feature set:
+- Push-to-talk transcription flow
+- Optional preview mode (`--preview`) for `send/edit/retry/skip/quit`
+- Required tmux + Codex CLI workflow
+- Existing target resolution, config persistence, JSONL logging, and doctor diagnostics
+
+Out of scope for this RC:
+- Always-on mode
+- Spoken replies (TTS)
+- Non-Linux platform support
+
+## Capabilities
+
+- Local speech capture via `arecord`
+- Local transcription via `faster-whisper`
+- Language selection: `en`, `de`, `auto`
+- tmux pane target selection with persisted default target
+- Normal mode: direct send after transcription
+- Preview mode: review/edit/retry/skip/quit before send
+- Runtime diagnostics via `dialogos --doctor`
+- Local JSONL turn logging
+
+## Limitations
+
+- Linux and tmux are mandatory
+- Codex CLI must run in a tmux pane
+- No always-on listening mode
+- No spoken output mode
+- Turn logs may contain transcript text and stay local on disk
+
+## Install
+
+### RC install from TestPyPI (recommended for `0.1.0rc1` validation)
+
+```bash
+pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' dialogos==0.1.0rc1
+```
+
+### Source install
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -U pip
 make install-dev
-make alpha-preview
 ```
 
-Useful alpha commands:
+### Final release install (after `0.1.0` publish)
 
 ```bash
-make alpha-preview-no-run
-make alpha-reset
+pipx install dialogos
 ```
 
-`make alpha-preview` now defaults to a higher-quality alpha profile (`small` + `cuda` + `float16`) with automatic CPU fallback if CUDA runtime is unavailable.
-If model download warns about unauthenticated Hugging Face access, set `HF_TOKEN=hf_xxx` (see `docs/user/alpha-preview.md`).
-Normal mode sends transcripts directly; add `--preview` to enable confirm/edit/retry/skip before sending.
+## Quick Start
 
-## Known Issue: Codex TUI Submit Timing
-
-### Status
-- Mitigated in Dialogos sender logic by splitting text send and submit key send.
-- Relevant to Codex CLI in tmux (observed with `codex-cli 0.107.0` on Linux).
-
-### Symptom
-- Transcript text appears in Codex input.
-- Prompt is not submitted until user manually presses Enter.
-
-### Expected behavior
-- User should only press Enter to start/stop recording.
-- Dialogos should submit the injected prompt automatically.
-
-### Root-cause observations
-- In generic tmux panes (bash/python/readline), a single call works:
-  - `tmux send-keys -t <target> "<text>" C-m`
-- In Codex TUI panes, single-call send was intermittently not submitted.
-- Reliable pattern in Codex TUI:
-  1. `tmux send-keys -t <target> "<text>"`
-  2. short delay (about 50ms)
-  3. `tmux send-keys -t <target> Enter`
-
-### Reproduction notes for TUI maintainers
-Use an isolated tmux session (do not use your working pane):
+Install required system packages:
 
 ```bash
-tmux new-session -d -s codex-diag "codex"
-sleep 10
-
-# often text-injected but not submitted in Codex TUI
-tmux send-keys -t codex-diag:0.0 "diag-single-call" C-m
-
-# reliably submitted in Codex TUI
-tmux send-keys -t codex-diag:0.0 "diag-split-call"
-sleep 0.05
-tmux send-keys -t codex-diag:0.0 Enter
+sudo apt update
+sudo apt install -y alsa-utils ffmpeg python3-venv tmux
 ```
 
-Optional verification: inspect `~/.codex/sessions` for presence of unique sent tokens.
+Run diagnostics:
 
-### Dialogos mitigation
-- Sender now performs split send with a short delay before submit key.
-- If you still observe missed submits in your environment, report:
-  - Codex CLI version
-  - tmux version
-  - terminal emulator
-  - whether a larger delay (for example 100ms) resolves it
+```bash
+dialogos --doctor
+```
 
-## Spec treatment
+Run normal mode:
 
-Specs under `specs/` are historical implementation plans.
-Once implemented and merged, they remain immutable records.
-Current behavior belongs in README and docs.
+```bash
+dialogos
+```
 
-## Architecture snapshot
+Run preview mode:
 
-Target dependency direction is strict:
-- `ui -> application -> domain`
-- `application -> ports`
-- `adapters -> ports`
-- `ui` composes adapters and wires use-cases
+```bash
+dialogos --preview
+```
 
-Reference docs:
-- [Architecture](docs/dev/architecture.md)
-- [Patterns Quickstart](docs/dev/patterns-quickstart.md)
-- [Dependency Rules](docs/dev/dependency-rules.md)
-- [Business Rules](docs/dev/business-rules.md)
-- [ADR Index](docs/dev/adr/README.md)
+Normal mode sends directly after transcription. Preview mode requires explicit confirmation.
 
-## Development commands
+## Known Issues
+
+### Codex submit timing in tmux
+
+Status:
+- Dialogos mitigates this by splitting text send and submit key send with a short delay.
+- The issue has been observed with Codex CLI in tmux on Linux.
+
+Symptom:
+- Transcript text appears in Codex input but is not submitted until manual Enter.
+
+Current mitigation in Dialogos:
+1. Send transcript text first.
+2. Wait briefly.
+3. Send Enter as a separate tmux operation.
+
+If you still see this behavior, open a bug report and include:
+- OS distribution and version
+- terminal emulator
+- tmux version
+- Codex CLI version
+- exact reproduction steps
+
+## Commands
 
 ```bash
 make install
 make install-dev
 make hooks
-make alpha-preview
-make alpha-reset
 make test-arch
 make check-rules
 make test-rules-fast
@@ -125,28 +138,26 @@ make test
 make gate
 ```
 
-## Documentation map
+## Documentation
 
-### User-facing
+User docs:
 - [Quickstart](docs/user/quickstart.md)
-- [Alpha Preview](docs/user/alpha-preview.md)
-- [Feedback Template](docs/user/feedback-template.md)
 - [Capabilities](docs/user/capabilities.md)
 - [Dependencies](docs/user/dependencies.md)
+- [Alpha Preview](docs/user/alpha-preview.md)
+- [Feedback Template](docs/user/feedback-template.md)
 
-### Agent-facing
-- [Agent Roles](docs/agents/roles.md)
-- [Agent Workflow](docs/agents/workflow.md)
-- [New Session Handoff](docs/agents/new-session-handoff.md)
-
-### Developer-only
+Developer docs:
 - [Architecture](docs/dev/architecture.md)
 - [Patterns Quickstart](docs/dev/patterns-quickstart.md)
 - [Dependency Rules](docs/dev/dependency-rules.md)
 - [Business Rules](docs/dev/business-rules.md)
-- [Patterns Deep Dive](docs/dev/patterns-deep-dive.md)
-- [ADR Index](docs/dev/adr/README.md)
-- [Deferred Ideas](docs/dev/deferred-ideas.md)
+- [RC Release Runbook](docs/dev/release-rc.md)
+
+Project docs:
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security](SECURITY.md)
 
 ## License
 
