@@ -15,7 +15,10 @@ def parse_args() -> argparse.Namespace:
 """
     parser = argparse.ArgumentParser(
         prog="dialogos",
-        description="Record mic audio, transcribe locally, and send text to tmux (direct in normal mode, confirmed in preview).",
+        description=(
+            "Record mic audio, transcribe locally, and send text to tmux "
+            "(direct in normal mode, confirmed in preview)."
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=examples,
     )
