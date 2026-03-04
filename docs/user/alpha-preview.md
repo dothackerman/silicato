@@ -32,7 +32,10 @@ What this does:
 
 If CUDA runtime is not available, Dialogos falls back to CPU `int8` automatically.
 
-Default alpha flow is direct send after transcription (no confirm prompt).\nUse `--preview` when you want to review/edit/retry/skip before sending.\n\n## Override defaults
+Default alpha flow is direct send after transcription (no confirm prompt).
+Use `--preview` when you want to review/edit/retry/skip before sending.
+
+## Override defaults
 
 You can override by passing CLI args:
 

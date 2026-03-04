@@ -37,6 +37,12 @@ make alpha-reset
 If model download warns about unauthenticated Hugging Face access, set `HF_TOKEN=hf_xxx` (see `docs/user/alpha-preview.md`).
 Normal mode sends transcripts directly; add `--preview` to enable confirm/edit/retry/skip before sending.
 
+## Spec treatment
+
+Specs under `specs/` are historical implementation plans.
+Once implemented and merged, they remain immutable records.
+Current behavior belongs in README and docs.
+
 ## Architecture snapshot
 
 Target dependency direction is strict:

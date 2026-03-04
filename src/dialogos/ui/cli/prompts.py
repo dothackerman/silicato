@@ -12,10 +12,8 @@ def prompt_turn_start() -> bool:
     return choice not in {"q", "quit", "exit"}
 
 
-def prompt_confirm(preview_mode: bool) -> str:
-    if preview_mode:
-        return input("Confirm [y=send, e=edit, r=retry, s=skip, q=quit]: ")
-    return input("Confirm [Enter=send, e=edit, r=retry, s=skip, q=quit]: ")
+def prompt_confirm() -> str:
+    return input("Confirm [y=send, e=edit, r=retry, s=skip, q=quit]: ")
 
 
 def prompt_edit_text(current_text: str) -> str:

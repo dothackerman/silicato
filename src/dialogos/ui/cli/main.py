@@ -201,8 +201,8 @@ def main() -> int:
 
             while True:
                 action = confirm_turn.execute(
-                    prompt_confirm(args.preview),
-                    preview_mode=args.preview,
+                    prompt_confirm(),
+                    preview_mode=True,
                 )
                 if action is None:
                     print("Invalid choice. In preview mode, send must be explicit (type 'y').")

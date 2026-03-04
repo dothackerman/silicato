@@ -34,6 +34,14 @@ On-demand docs:
 - `docs/dev/adr/*`
 - `src/dialogos/<layer>/README.md` for touched layer(s)
 
+## Spec lifecycle
+
+- `specs/*.md` files are historical plan records.
+- Once implemented and merged, specs are immutable.
+- Do not edit old specs to reflect later behavior.
+- For new behavior, write a new spec and link back to the superseded plan.
+- Keep current behavior in README and user/dev docs.
+
 ## Required local gate
 
 Run architecture checks early:
@@ -58,9 +66,9 @@ If hardware tests fail, the gate fails.
 
 ## Workflow per feature
 
-1. Create or update `specs/<feature>.md`.
+1. Create or update `specs/<feature>.md` before implementation.
 2. Builder agent implements code + tests in owned layer(s).
 3. Builder validates layer dependency rules (`make test-arch`).
 4. Quality agent runs `make gate` and reviews architecture fit.
-5. Docs agent updates affected docs/specs, including ADRs when architecture decisions changed.
+5. Docs agent updates affected docs, and updates specs only when creating a new plan.
 6. Merge only after required signoffs.

@@ -23,6 +23,13 @@ On-demand pack (read only when needed for the task):
 Session-lead rule:
 - Do not require deep-dive docs when bootstrap plus touched layer README is sufficient.
 
+## Spec lifecycle policy
+- Files in `specs/` are plan snapshots, not living requirement docs.
+- After a spec is implemented and merged, treat it as immutable history.
+- Do not rewrite implemented specs to match later behavior.
+- For behavior changes, create a new spec and reference superseded specs.
+- Current behavior must be documented in README and user/dev docs, not retrofitted into old specs.
+
 ## Required flow
 1. Start from `specs/<feature>.md` (create/update first).
 2. Implement inside layer boundaries (`ui -> application -> domain`, application via ports).
