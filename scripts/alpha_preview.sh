@@ -63,7 +63,9 @@ echo "Running diagnostics (dialogos --doctor)..."
 "$PYTHON" -m dialogos --doctor
 
 echo
+HAS_TMUX_SESSION=0
 if tmux list-panes -a >/dev/null 2>&1; then
+  HAS_TMUX_SESSION=1
   echo "tmux session detected."
 else
   echo "No active tmux session detected."
@@ -74,6 +76,13 @@ fi
 if [[ "$NO_RUN" -eq 1 ]]; then
   echo
   echo "Preview checks complete (--no-run)."
+  exit 0
+fi
+
+if [[ "$HAS_TMUX_SESSION" -eq 0 ]]; then
+  echo
+  echo "Alpha preview stopped before launch because no tmux session is running."
+  echo "This is expected on first run. After creating a tmux session, rerun: make alpha-preview"
   exit 0
 fi
 
