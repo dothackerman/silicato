@@ -17,14 +17,34 @@ make install-dev
 make hooks
 ```
 
-## 3) Start a tmux session with Codex
+## 3) Fastest way to try Dialogos (alpha preview)
+
+```bash
+make alpha-preview
+```
+
+If you only want checks and environment info (no interactive run):
+
+```bash
+make alpha-preview-no-run
+```
+
+To reset local alpha state and replay first-run behavior:
+
+```bash
+make alpha-reset
+```
+
+## 4) Manual run path
+
+Start a tmux session with Codex:
 
 ```bash
 tmux new -s codex
 # start Codex in that tmux session
 ```
 
-## 4) Run Dialogos
+Run Dialogos manually:
 
 ```bash
 dialogos --model small --language auto

@@ -14,6 +14,25 @@ Milestone status: **Milestone 2 architecture migration target** (runtime behavio
 "Dialogos" comes from the Greek root associated with dialogue and exchange.
 The project goal matches that meaning: a natural conversational channel between human speech and Codex.
 
+## Alpha preview (recommended for now)
+
+From a fresh clone:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -U pip
+make install-dev
+make alpha-preview
+```
+
+Useful alpha commands:
+
+```bash
+make alpha-preview-no-run
+make alpha-reset
+```
+
 ## Architecture snapshot
 
 Target dependency direction is strict:
@@ -34,6 +53,8 @@ Reference docs:
 make install
 make install-dev
 make hooks
+make alpha-preview
+make alpha-reset
 make test-arch
 make check
 make test-fast
@@ -45,6 +66,8 @@ make gate
 
 ### User-facing
 - [Quickstart](docs/user/quickstart.md)
+- [Alpha Preview](docs/user/alpha-preview.md)
+- [Feedback Template](docs/user/feedback-template.md)
 - [Capabilities](docs/user/capabilities.md)
 - [Dependencies](docs/user/dependencies.md)
 
