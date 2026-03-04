@@ -99,6 +99,16 @@ tests = [
 ]
 
 [[rule]]
+id = "BR-TMUX-002"
+statement = "Tmux sender submits prompts using split text and delayed Enter to avoid Codex TUI submit misses."
+owner_layer = "adapters"
+requires_hardware = false
+tests = [
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_sends_message",
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_raises_on_submit_key_failure",
+]
+
+[[rule]]
 id = "BR-HW-001"
 statement = "Local hardware checks validate arecord availability and tmux send smoke behavior."
 owner_layer = "adapters"

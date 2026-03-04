@@ -87,6 +87,15 @@ This removes local files if present:
 - No spoken assistant replies (TTS).
 - Linux + tmux workflow only.
 
+## Known issue note: Codex submit timing
+
+Some environments using older Dialogos sender behavior may inject transcript text into Codex
+without submitting the prompt until Enter is pressed manually.
+
+Dialogos now mitigates this by sending text and submit key as two tmux operations with a short delay.
+If you still observe the issue, capture your Codex CLI version, tmux version, and terminal emulator
+and open a bug report with reproduction steps.
+
 ## Give feedback
 
 Use the lightweight template in [Feedback Template](feedback-template.md).

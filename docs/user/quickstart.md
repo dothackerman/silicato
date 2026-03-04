@@ -69,7 +69,8 @@ Controls (normal mode):
 - Press `Enter` to start recording
 - Press `Enter` to stop recording
 - Transcript is sent to Codex directly (no confirm prompt)
-- `tmux send-keys ... C-m` submits automatically, so no extra Enter in Codex window
+- Dialogos submits automatically (text send + short delayed Enter in tmux)
+- If an older Dialogos version injects text but does not submit, press Enter once manually
 
 Preview mode:
 

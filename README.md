@@ -37,6 +37,55 @@ make alpha-reset
 If model download warns about unauthenticated Hugging Face access, set `HF_TOKEN=hf_xxx` (see `docs/user/alpha-preview.md`).
 Normal mode sends transcripts directly; add `--preview` to enable confirm/edit/retry/skip before sending.
 
+## Known Issue: Codex TUI Submit Timing
+
+### Status
+- Mitigated in Dialogos sender logic by splitting text send and submit key send.
+- Relevant to Codex CLI in tmux (observed with `codex-cli 0.107.0` on Linux).
+
+### Symptom
+- Transcript text appears in Codex input.
+- Prompt is not submitted until user manually presses Enter.
+
+### Expected behavior
+- User should only press Enter to start/stop recording.
+- Dialogos should submit the injected prompt automatically.
+
+### Root-cause observations
+- In generic tmux panes (bash/python/readline), a single call works:
+  - `tmux send-keys -t <target> "<text>" C-m`
+- In Codex TUI panes, single-call send was intermittently not submitted.
+- Reliable pattern in Codex TUI:
+  1. `tmux send-keys -t <target> "<text>"`
+  2. short delay (about 50ms)
+  3. `tmux send-keys -t <target> Enter`
+
+### Reproduction notes for TUI maintainers
+Use an isolated tmux session (do not use your working pane):
+
+```bash
+tmux new-session -d -s codex-diag "codex"
+sleep 10
+
+# often text-injected but not submitted in Codex TUI
+tmux send-keys -t codex-diag:0.0 "diag-single-call" C-m
+
+# reliably submitted in Codex TUI
+tmux send-keys -t codex-diag:0.0 "diag-split-call"
+sleep 0.05
+tmux send-keys -t codex-diag:0.0 Enter
+```
+
+Optional verification: inspect `~/.codex/sessions` for presence of unique sent tokens.
+
+### Dialogos mitigation
+- Sender now performs split send with a short delay before submit key.
+- If you still observe missed submits in your environment, report:
+  - Codex CLI version
+  - tmux version
+  - terminal emulator
+  - whether a larger delay (for example 100ms) resolves it
+
 ## Spec treatment
 
 Specs under `specs/` are historical implementation plans.
