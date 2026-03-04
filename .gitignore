@@ -30,6 +30,7 @@ output/
 # Local environment files
 .env
 .env.*
+!.env.example
 
 # Editor/OS noise
 .vscode/
