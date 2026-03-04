@@ -1,8 +1,0 @@
-Metadata-Version: 2.4
-Name: dialogos
-Version: 0.1.0
-Summary: Voice bridge for Linux users to talk to Codex.
-Requires-Python: >=3.12
-License-File: LICENSE
-Requires-Dist: faster-whisper>=1.1.0
-Dynamic: license-file
