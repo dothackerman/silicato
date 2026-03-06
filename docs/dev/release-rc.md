@@ -1,6 +1,6 @@
 # RC Release Runbook
 
-This runbook covers `0.1.0rc1`-style release candidate publication and validation.
+This runbook covers `0.1.0rc2`-style release candidate publication and validation.
 
 ## Scope guardrails
 
@@ -79,7 +79,7 @@ python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 ## pipx validation from TestPyPI
 
 ```bash
-pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' silicato==0.1.0rc1
+pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' silicato==0.1.0rc2
 
 silicato --doctor
 silicato --help

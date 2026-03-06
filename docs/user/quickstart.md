@@ -22,10 +22,10 @@ sudo apt install -y alsa-utils ffmpeg python3-venv tmux
 
 ## 3) Install Silicato
 
-### Option A: RC install from TestPyPI (`0.1.0rc1`)
+### Option A: RC install from PyPI (`0.1.0rc2`)
 
 ```bash
-pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' silicato==0.1.0rc1
+pipx install silicato==0.1.0rc2
 ```
 
 ### Option B: install from source checkout
@@ -37,6 +37,8 @@ python3 -m pip install -U pip
 make install-dev
 make hooks
 ```
+
+For maintainer TestPyPI validation steps, see `docs/dev/release-rc.md`.
 
 ## 4) Start your agent CLI in tmux
 

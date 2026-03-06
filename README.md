@@ -2,7 +2,7 @@
 
 Silicato is a Linux voice bridge from push-to-talk microphone input to a selected AI-agent tmux pane.
 
-Current release candidate: `0.1.0rc1`.
+Current release candidate: `0.1.0rc2`.
 
 ## Supported Platforms
 
@@ -17,7 +17,7 @@ Validated baseline for this RC:
 
 ## Release Scope
 
-`0.1.0rc1` is intentionally limited to the current feature set:
+`0.1.0rc2` is intentionally limited to the current feature set:
 - Push-to-talk transcription flow
 - Optional preview mode (`--preview`) for `send/edit/retry/skip/quit`
 - Required tmux + terminal agent CLI workflow
@@ -49,10 +49,10 @@ Out of scope for this RC:
 
 ## Install
 
-### RC install from TestPyPI (recommended for `0.1.0rc1` validation)
+### Install from PyPI (`0.1.0rc2`)
 
 ```bash
-pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' silicato==0.1.0rc1
+pipx install silicato==0.1.0rc2
 ```
 
 ### Source install
@@ -69,6 +69,8 @@ make install-dev
 ```bash
 pipx install silicato
 ```
+
+Maintainer-only TestPyPI validation steps live in `docs/dev/release-rc.md`.
 
 ## Quick Start
 

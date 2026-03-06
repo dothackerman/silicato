@@ -12,8 +12,8 @@ body:
     id: version
     attributes:
       label: Silicato version
-      description: Example: 0.1.0rc1
-      placeholder: 0.1.0rc1
+      description: Example: 0.1.0rc2
+      placeholder: 0.1.0rc2
     validations:
       required: true
   - type: input
