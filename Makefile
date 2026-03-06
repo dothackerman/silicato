@@ -1,4 +1,4 @@
-.PHONY: install install-dev hooks format lint typecheck check check-rules test-arch test-rules test-rules-fast test test-fast gate alpha-preview alpha-preview-no-run alpha-reset
+.PHONY: install install-dev hooks format lint typecheck check check-rules test-arch test-rules test-rules-fast test test-fast gate alpha-preview alpha-preview-no-run alpha-reset release-test release-prod
 
 VENV_PYTHON := .venv/bin/python3
 
@@ -57,3 +57,17 @@ alpha-preview-no-run:
 
 alpha-reset:
 	./scripts/reset_alpha_state.sh --yes
+
+release-test:
+	@if [ -z "$(VERSION)" ]; then \
+		echo "Usage: make release-test VERSION=0.1.0rc3 [REF=main] [SKIP_GATE=1]"; \
+		exit 1; \
+	fi
+	$(PYTHON) scripts/release_cli.py --channel test --version "$(VERSION)" --ref "$(if $(REF),$(REF),main)" $(if $(SKIP_GATE),--skip-gate,)
+
+release-prod:
+	@if [ -z "$(VERSION)" ]; then \
+		echo "Usage: make release-prod VERSION=0.1.0rc3 [REF=main] [SKIP_GATE=1]"; \
+		exit 1; \
+	fi
+	$(PYTHON) scripts/release_cli.py --channel prod --version "$(VERSION)" --ref "$(if $(REF),$(REF),main)" $(if $(SKIP_GATE),--skip-gate,)

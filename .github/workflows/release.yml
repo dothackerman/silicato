@@ -1,0 +1,198 @@
+name: Release Publish
+run-name: release-${{ github.event.inputs.channel }}-${{ github.event.inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Release channel (test publishes to TestPyPI, prod publishes to PyPI)"
+        required: true
+        type: choice
+        options:
+          - test
+          - prod
+      version:
+        description: "Version from pyproject.toml (for example 0.1.0rc2)"
+        required: true
+        type: string
+      ref:
+        description: "Git ref to build from"
+        required: false
+        default: "main"
+        type: string
+      create_github_release:
+        description: "Create or update GitHub release and upload wheel/sdist"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.event.inputs.channel }}-${{ github.event.inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag: ${{ steps.validate.outputs.tag }}
+      prerelease: ${{ steps.validate.outputs.prerelease }}
+    steps:
+      - name: Validate workflow inputs
+        id: validate
+        run: |
+          set -euo pipefail
+          CHANNEL="${{ github.event.inputs.channel }}"
+          VERSION="${{ github.event.inputs.version }}"
+
+          if [[ "$CHANNEL" != "test" && "$CHANNEL" != "prod" ]]; then
+            echo "Unsupported channel: $CHANNEL" >&2
+            exit 1
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([a-z]+[0-9]+)?$ ]]; then
+            echo "Invalid version format: $VERSION" >&2
+            exit 1
+          fi
+
+          TAG="v$VERSION"
+          PRERELEASE=false
+          if [[ "$CHANNEL" == "test" || "$VERSION" == *rc* ]]; then
+            PRERELEASE=true
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify pyproject version matches input
+        env:
+          EXPECTED_VERSION: ${{ needs.preflight.outputs.version }}
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          expected = os.environ["EXPECTED_VERSION"]
+          data = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+          actual = data["project"]["version"]
+          if actual != expected:
+              raise SystemExit(f"pyproject version {actual!r} != workflow input {expected!r}")
+          print(f"pyproject version OK: {actual}")
+          PY
+
+      - name: Build artifacts
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          python -m twine check dist/*
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ needs.preflight.outputs.version }}
+          path: dist/*
+
+  publish:
+    needs:
+      - preflight
+      - build
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.channel == 'test' && 'testpypi' || 'pypi-prod' }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.preflight.outputs.version }}
+          path: dist
+
+      - name: Publish to TestPyPI
+        if: ${{ github.event.inputs.channel == 'test' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Publish to PyPI
+        if: ${{ github.event.inputs.channel == 'prod' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    if: ${{ github.event.inputs.create_github_release == 'true' }}
+    needs:
+      - preflight
+      - build
+      - publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.preflight.outputs.version }}
+          path: dist
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ github.event.inputs.channel }}
+          VERSION: ${{ needs.preflight.outputs.version }}
+          TAG: ${{ needs.preflight.outputs.tag }}
+          REF: ${{ github.event.inputs.ref }}
+          PRERELEASE: ${{ needs.preflight.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+
+          NOTES_FILE="$(mktemp)"
+          {
+            echo "Automated release via GitHub Actions."
+            echo
+            echo "- channel: $CHANNEL"
+            echo "- version: $VERSION"
+            echo "- ref: $REF"
+          } > "$NOTES_FILE"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+            gh release edit "$TAG" --title "Silicato $VERSION" --notes-file "$NOTES_FILE"
+          else
+            ARGS=("$TAG" dist/* --target "$REF" --title "Silicato $VERSION" --notes-file "$NOTES_FILE")
+            if [[ "$PRERELEASE" == "true" ]]; then
+              ARGS+=(--prerelease)
+            fi
+            gh release create "${ARGS[@]}"
+          fi
+
+          gh release view "$TAG" --json url -q .url >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add package URL to summary
+        env:
+          CHANNEL: ${{ github.event.inputs.channel }}
+          VERSION: ${{ needs.preflight.outputs.version }}
+        run: |
+          if [[ "$CHANNEL" == "test" ]]; then
+            echo "https://test.pypi.org/project/silicato/$VERSION/" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "https://pypi.org/project/silicato/$VERSION/" >> "$GITHUB_STEP_SUMMARY"
+          fi

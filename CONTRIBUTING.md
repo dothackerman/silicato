@@ -71,12 +71,14 @@ make test-rules
 Use the dedicated runbook:
 - [RC Release Runbook](docs/dev/release-rc.md)
 
-This includes:
-- TestPyPI token setup in `.env` (`TEST_PYPI_TOKEN`)
-- artifact build and twine checks
-- TestPyPI upload command
-- `pipx` install validation flow
-- required stop before real PyPI upload pending explicit go/no-go
+Primary commands:
+- `make release-test VERSION=<version>`
+- `make release-prod VERSION=<version>`
+
+The runbook covers:
+- Trusted Publishing setup values for PyPI and TestPyPI
+- GitHub environment requirements
+- local preflight + gate behavior
 
 ## Architecture boundaries
 

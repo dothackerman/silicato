@@ -1,6 +1,6 @@
 # RC Release Runbook
 
-This runbook covers `0.1.0rc2`-style release candidate publication and validation.
+This runbook documents the manual-but-automated release flow for release candidates.
 
 ## Scope guardrails
 
@@ -9,81 +9,76 @@ Do not add product features during RC release work. Keep scope locked to:
 - optional `--preview` flow
 - existing tmux target/config/logging/doctor behavior
 
-## Prerequisites
+## Release model
 
-- Python 3.12+
-- `.venv` with dev dependencies (`make install-dev`)
-- TestPyPI account
-- TestPyPI API token in `.env` as `TEST_PYPI_TOKEN`
-- `pipx` installed and available in `PATH`
+Default release path:
+- local preflight and gate via `make release-test` / `make release-prod`
+- publish from GitHub Actions via Trusted Publishing (OIDC)
+- no local PyPI/TestPyPI token usage in normal flow
 
-## Create TestPyPI token
+Workflow file:
+- `.github/workflows/release.yml`
 
-1. Sign in at `https://test.pypi.org/`.
-2. Open Account Settings -> API tokens.
-3. Create a new token (project-scoped token preferred).
-4. Copy token once and store locally in `.env`:
+## One-time setup outside this repository
 
-```bash
-TEST_PYPI_TOKEN=pypi-<token-value>
-```
+### 1) GitHub environments
 
-Do not commit `.env` and do not print token values in terminal logs.
+Create both environments in repository settings:
+- `testpypi`
+- `pypi-prod`
 
-Legacy local setups may still use `TEST_PYPI_API_TOKEN`. If present, either rename it to
-`TEST_PYPI_TOKEN` or export a compatibility alias before upload:
+Recommended:
+- add required reviewers to `pypi-prod`
+- keep `testpypi` unblocked for faster RC loops
 
-```bash
-export TEST_PYPI_TOKEN="${TEST_PYPI_TOKEN:-${TEST_PYPI_API_TOKEN:-}}"
-```
+### 2) Trusted Publishers (PyPI + TestPyPI)
 
-## Load local env vars
+In the publisher form, use these values.
 
-```bash
-set -a
-source .env
-set +a
-```
+TestPyPI publisher:
+- Owner: `dothackerman`
+- Repository name: `silicato`
+- Workflow name: `release.yml`
+- Environment name: `testpypi`
 
-Sanity check without printing secrets:
+PyPI publisher:
+- Owner: `dothackerman`
+- Repository name: `silicato`
+- Workflow name: `release.yml`
+- Environment name: `pypi-prod`
 
-```bash
-[ -n "${TEST_PYPI_TOKEN:-${TEST_PYPI_API_TOKEN:-}}" ] && echo "token present" || echo "token missing"
-```
+### 3) GitHub CLI auth
 
-## Build and metadata check
+Ensure `gh` is authenticated locally:
 
 ```bash
-rm -rf dist build *.egg-info src/*.egg-info
-python3 -m build
-python3 -m twine check dist/*
+gh auth status
 ```
 
-## Required quality gates
+## Local release commands
+
+Test lane (publishes to TestPyPI + GitHub prerelease):
 
 ```bash
-make check
-make test-rules-fast
-make gate
-make test-rules
+make release-test VERSION=0.1.0rc3
 ```
 
-## Upload to TestPyPI
+Prod lane (publishes to PyPI + GitHub release):
 
 ```bash
-TWINE_USERNAME=__token__ \
-TWINE_PASSWORD="${TEST_PYPI_TOKEN:-${TEST_PYPI_API_TOKEN:-}}" \
-python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+make release-prod VERSION=0.1.0rc3
 ```
 
-## pipx validation from TestPyPI
+Optional overrides:
+- `REF=<git-ref>` to release from a ref other than `main`
+- `SKIP_GATE=1` to skip local `make gate` (not recommended)
 
-```bash
-pipx install --index-url https://test.pypi.org/simple --pip-args='--extra-index-url https://pypi.org/simple' silicato==0.1.0rc2
-
-silicato --doctor
-silicato --help
-```
+What the command does:
+1. require clean git tree
+2. verify `pyproject.toml` version matches `VERSION`
+3. run local `make gate` (unless skipped)
+4. dispatch `release.yml` with `workflow_dispatch`
+5. watch workflow completion and return non-zero on failure
 
 ## Manual UX acceptance
 
@@ -93,6 +88,7 @@ Run both:
 
 Verify transcript send does not require extra manual Enter.
 
-## Stop point before real PyPI
+## Break-glass fallback (not default)
 
-Do not upload to real PyPI until explicit user go/no-go is given after manual UX signoff.
+If GitHub Actions publishing is unavailable, local Twine upload can still be used with local tokens.
+Treat this as exception-only flow and rotate tokens after any accidental exposure.
