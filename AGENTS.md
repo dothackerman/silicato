@@ -58,6 +58,13 @@ Use Conventional Commits only:
 - `test(scope): ...`
 - `chore(scope): ...`
 
+## Git cadence (Non-Negotiable)
+- Git is backup and rollback. Use it continuously.
+- Commit related changes together in small slices once checks are green.
+- Push every clean, meaningful commit promptly (do not accumulate local-only commits).
+- Do not finish a task with relevant uncommitted or unpushed changes.
+- Never batch unrelated work in one commit.
+
 ## Commands
 - Install runtime deps: `make install`
 - Install dev deps: `make install-dev`
