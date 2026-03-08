@@ -3,6 +3,8 @@ from __future__ import annotations
 from argparse import Namespace
 from dataclasses import dataclass
 
+import pytest
+
 from silicato.ports.storage import SilicatoConfig
 from silicato.ui.cli.profiles import RuntimeSettings
 
@@ -44,7 +46,7 @@ class _FakeConfirmTurnUseCase:
         return None
 
 
-def test_main_uses_profile_resolved_model_settings(monkeypatch) -> None:
+def test_main_uses_profile_resolved_model_settings(monkeypatch: pytest.MonkeyPatch) -> None:
     from silicato.ui.cli import main as cli_main
 
     args = Namespace(
@@ -93,7 +95,7 @@ def test_main_uses_profile_resolved_model_settings(monkeypatch) -> None:
 
     called: list[tuple[str, str, str]] = []
 
-    def _fake_build_model(model: str, device: str, compute_type: str):
+    def _fake_build_model(model: str, device: str, compute_type: str) -> tuple[object, str, str]:
         called.append((model, device, compute_type))
         return object(), device, compute_type
 

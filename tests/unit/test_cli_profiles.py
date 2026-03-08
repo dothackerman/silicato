@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from silicato.ui.cli.profiles import RuntimeSettings, apply_profile, resolve_spawn_profile_settings
 
 
@@ -13,7 +15,7 @@ def test_apply_profile_returns_manual_settings_when_profile_absent() -> None:
     )
 
 
-def test_resolve_spawn_profile_cpu_fallback_when_no_gpu(monkeypatch) -> None:
+def test_resolve_spawn_profile_cpu_fallback_when_no_gpu(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("silicato.ui.cli.profiles.detect_gpu_total_vram_mb", lambda: None)
 
     settings = resolve_spawn_profile_settings()
@@ -24,7 +26,7 @@ def test_resolve_spawn_profile_cpu_fallback_when_no_gpu(monkeypatch) -> None:
     assert "no NVIDIA GPU" in settings.reason
 
 
-def test_resolve_spawn_profile_6gb_gpu_prefers_small_int8_float16(monkeypatch) -> None:
+def test_resolve_spawn_profile_6gb_gpu_prefers_small_int8_float16(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("silicato.ui.cli.profiles.detect_gpu_total_vram_mb", lambda: 6144)
 
     settings = resolve_spawn_profile_settings()
