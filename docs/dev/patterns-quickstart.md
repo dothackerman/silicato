@@ -46,3 +46,6 @@ Allowed dependency flow:
 2. Open only the touched layer README under `src/silicato/<layer>/README.md`.
 3. Implement in the lowest valid layer.
 4. Add or update tests in the expected test category.
+
+Checks reference:
+- `docs/dev/repo-checks.md`

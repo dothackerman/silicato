@@ -33,6 +33,9 @@ Behavior:
 
 `make gate` runs fast rule regressions by default.
 
+Checks reference:
+- `docs/dev/repo-checks.md`
+
 ## Update policy
 
 When behavior changes:

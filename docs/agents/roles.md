@@ -11,6 +11,7 @@ Silicato uses a 3-role multi-agent model.
 - Reviews maintainability, correctness, and legibility.
 - Enforces formatting, linting, typing, and full gate checks.
 - Confirms hardware tests remain blocking for gate signoff.
+- Uses `docs/dev/repo-checks.md` as the canonical checks matrix.
 
 ## 3) Docs Agent
 - Updates user-facing docs for behavior/dependency changes.

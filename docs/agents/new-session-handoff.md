@@ -5,7 +5,8 @@
 2. `docs/dev/patterns-quickstart.md`
 3. `docs/dev/dependency-rules.md`
 4. `docs/dev/business-rules.md`
-5. `docs/agents/workflow.md`
+5. `docs/agents/new-session-handoff.md` (this file)
+6. `docs/agents/workflow.md`
 
 ## Read on-demand (task-dependent)
 1. `docs/dev/patterns-deep-dive.md`
@@ -17,6 +18,8 @@
 - Implement exactly approved scope from the active spec.
 - Preserve MVP runtime behavior unless the spec explicitly changes behavior.
 - Run `make test-arch`, `make test-rules-fast`, and `make gate` before final push.
+- For release-prep tasks, also run `make test-rules` and `make test-e2e-tmux`.
+- Use `docs/dev/repo-checks.md` as the canonical checks matrix.
 
 Kickoff prompt for a new Codex session:
 

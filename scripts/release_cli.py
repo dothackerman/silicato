@@ -127,7 +127,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         description="Run local preflight checks and dispatch manual GitHub release workflow."
     )
     parser.add_argument("--channel", required=True, choices=["test", "prod"])
-    parser.add_argument("--version", required=True, help="Version in pyproject.toml, e.g. 0.1.0rc3")
+    parser.add_argument(
+        "--version", required=True, help="Version in pyproject.toml, e.g. 0.1.0rc3 or 0.1.0"
+    )
     parser.add_argument("--ref", default="main", help="Git ref to release from (default: main)")
     parser.add_argument(
         "--skip-gate",

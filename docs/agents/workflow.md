@@ -67,6 +67,16 @@ make gate
 
 If hardware tests fail, the gate fails.
 
+For release-prep work, also run:
+
+```bash
+make test-rules
+make test-e2e-tmux
+```
+
+Canonical check matrix:
+- `docs/dev/repo-checks.md`
+
 ## Workflow per feature
 
 1. Create or update `specs/<feature>.md` before implementation.

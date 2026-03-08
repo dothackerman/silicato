@@ -26,7 +26,9 @@ def test_resolve_spawn_profile_cpu_fallback_when_no_gpu(monkeypatch: pytest.Monk
     assert "no NVIDIA GPU" in settings.reason
 
 
-def test_resolve_spawn_profile_6gb_gpu_prefers_small_int8_float16(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_resolve_spawn_profile_6gb_gpu_prefers_small_int8_float16(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr("silicato.ui.cli.profiles.detect_gpu_total_vram_mb", lambda: 6144)
 
     settings = resolve_spawn_profile_settings()

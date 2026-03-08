@@ -52,6 +52,9 @@ make gate
 
 Architecture violations are blocking.
 
+Checks reference:
+- `docs/dev/repo-checks.md`
+
 ## Review checklist
 
 1. Is the change in the correct layer for its responsibility?

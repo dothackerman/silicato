@@ -75,4 +75,9 @@ Use Conventional Commits only:
 - Full business-rule regressions: `make test-rules`
 - Quality checks: `make check`
 - Fast tests (no hardware): `make test-fast`
+- Dedicated tmux smoke checks: `make test-e2e-tmux`
 - Full gate (blocking): `make gate`
+- Release dispatch helpers: `make release-test VERSION=<version>`, `make release-prod VERSION=<version>`
+
+Canonical check matrix:
+- `docs/dev/repo-checks.md`

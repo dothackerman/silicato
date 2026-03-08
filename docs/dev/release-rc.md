@@ -15,6 +15,7 @@ Default release path:
 - local preflight and gate via `make release-test` / `make release-prod`
 - publish from GitHub Actions via Trusted Publishing (OIDC)
 - no local PyPI/TestPyPI token usage in normal flow
+- baseline checks reference: `docs/dev/repo-checks.md`
 
 Workflow file:
 - `.github/workflows/release.yml`
@@ -60,18 +61,22 @@ gh auth status
 Test lane (publishes to TestPyPI + GitHub prerelease):
 
 ```bash
-make release-test VERSION=0.1.0rc3
+make release-test VERSION=<version>
 ```
 
 Prod lane (publishes to PyPI + GitHub release):
 
 ```bash
-make release-prod VERSION=0.1.0rc3
+make release-prod VERSION=<version>
 ```
 
 Optional overrides:
 - `REF=<git-ref>` to release from a ref other than `main`
 - `SKIP_GATE=1` to skip local `make gate` (not recommended)
+
+Version examples:
+- RC: `0.1.0rc3`
+- Final: `0.1.0`
 
 What the command does:
 1. require clean git tree
@@ -79,6 +84,14 @@ What the command does:
 3. run local `make gate` (unless skipped)
 4. dispatch `release.yml` with `workflow_dispatch`
 5. watch workflow completion and return non-zero on failure
+
+Recommended release-prep commands before dispatch:
+
+```bash
+make gate
+make test-rules
+make test-e2e-tmux
+```
 
 ## Manual UX acceptance
 

@@ -5,7 +5,11 @@ from __future__ import annotations
 
 def prompt_turn_start() -> bool:
     try:
-        choice = input("Press Enter to talk, or type 'q' then Enter to quit: ").strip().lower()
+        choice = (
+            input("Press Enter to start recording, or type 'q' then Enter to quit: ")
+            .strip()
+            .lower()
+        )
     except EOFError:
         print()
         return False

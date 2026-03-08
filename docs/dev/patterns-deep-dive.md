@@ -79,3 +79,6 @@ Tradeoffs:
 
 When not to use:
 - Never skipped for production paths. For experiments, isolate outside protected tree.
+
+Checks reference:
+- `docs/dev/repo-checks.md`

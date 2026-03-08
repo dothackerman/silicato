@@ -2,13 +2,14 @@ version = 1
 
 [[rule]]
 id = "BR-TARGET-001"
-statement = "Default target resolution is CLI > interactive picker, with env/config reuse available via explicit reuse mode."
+statement = "Default target resolution is CLI > interactive picker, with env/config reuse available via explicit reuse mode. Invalid env targets fail fast; invalid remembered targets fall back to picker."
 owner_layer = "application"
 requires_hardware = false
 tests = [
   "tests/unit/test_cli_helpers.py::test_resolve_tmux_target_prefers_cli",
   "tests/unit/test_cli_helpers.py::test_resolve_tmux_target_uses_picker_by_default_even_when_env_or_config_exist",
   "tests/unit/test_cli_helpers.py::test_resolve_tmux_target_uses_env_when_available",
+  "tests/unit/test_cli_helpers.py::test_resolve_tmux_target_invalid_env_target_fails_fast",
   "tests/unit/test_cli_helpers.py::test_resolve_tmux_target_falls_back_to_picker_for_invalid_config",
   "tests/integration/test_fake_turn_flow.py::test_remembered_target_reuse_and_cli_override",
 ]
@@ -21,6 +22,7 @@ requires_hardware = false
 tests = [
   "tests/unit/test_cli_args.py::test_parse_args_supports_short_options",
   "tests/unit/test_cli_args.py::test_parse_args_picker_is_default_and_reuse_can_be_opted_in",
+  "tests/unit/test_cli_args.py::test_parse_args_help_text_mentions_target_modes_and_preview_actions",
 ]
 
 [[rule]]

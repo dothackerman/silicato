@@ -157,7 +157,12 @@ make test-fast
 make test-e2e-tmux
 make test
 make gate
+make release-test VERSION=<version>
+make release-prod VERSION=<version>
 ```
+
+Checks reference:
+- `docs/dev/repo-checks.md`
 
 ## Documentation
 
@@ -173,6 +178,7 @@ Developer docs:
 - [Patterns Quickstart](docs/dev/patterns-quickstart.md)
 - [Dependency Rules](docs/dev/dependency-rules.md)
 - [Business Rules](docs/dev/business-rules.md)
+- [Repository Checks](docs/dev/repo-checks.md)
 - [RC Release Runbook](docs/dev/release-rc.md)
 
 Project docs:

@@ -52,7 +52,7 @@ Forbidden:
 - `ui -> domain`
 
 ## Turn behavior
-1. Resolve tmux target (`--tmux-target` -> picker by default, or `--reuse-target` mode: env -> remembered -> picker)
+1. Resolve tmux target (`--tmux-target` -> picker by default, or `--reuse-target` mode: env -> remembered -> picker; invalid env fails fast, invalid remembered falls back to picker)
 2. Validate target
 3. Capture push-to-talk audio
 4. Transcribe locally
@@ -67,6 +67,7 @@ Forbidden:
 - Use `make test-rules` for full business-rule regressions (includes hardware)
 - `make gate` remains the blocking local gate
 - Architecture and rule checks are expected to run inside `make check`/`make gate`
+- Checks matrix reference: `docs/dev/repo-checks.md`
 
 ## Testing taxonomy target
 - `tests/unit`: pure logic and helpers

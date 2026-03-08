@@ -60,11 +60,18 @@ make test-rules-fast
 Blocking checks before merge:
 
 ```bash
-make check
-make test-rules-fast
 make gate
-make test-rules
 ```
+
+Release-prep checks (maintainers):
+
+```bash
+make test-rules
+make test-e2e-tmux
+```
+
+Canonical check matrix:
+- `docs/dev/repo-checks.md`
 
 ## RC release workflow (maintainers)
 

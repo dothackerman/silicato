@@ -63,14 +63,14 @@ alpha-reset:
 
 release-test:
 	@if [ -z "$(VERSION)" ]; then \
-		echo "Usage: make release-test VERSION=0.1.0rc3 [REF=main] [SKIP_GATE=1]"; \
+		echo "Usage: make release-test VERSION=<version> [REF=main] [SKIP_GATE=1]"; \
 		exit 1; \
 	fi
 	$(PYTHON) scripts/release_cli.py --channel test --version "$(VERSION)" --ref "$(if $(REF),$(REF),main)" $(if $(SKIP_GATE),--skip-gate,)
 
 release-prod:
 	@if [ -z "$(VERSION)" ]; then \
-		echo "Usage: make release-prod VERSION=0.1.0rc3 [REF=main] [SKIP_GATE=1]"; \
+		echo "Usage: make release-prod VERSION=<version> [REF=main] [SKIP_GATE=1]"; \
 		exit 1; \
 	fi
 	$(PYTHON) scripts/release_cli.py --channel prod --version "$(VERSION)" --ref "$(if $(REF),$(REF),main)" $(if $(SKIP_GATE),--skip-gate,)
