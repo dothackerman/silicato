@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from silicato.adapters.stt.whisper import is_cuda_runtime_missing
 from silicato.application.use_cases.resolve_target import ResolveTargetUseCase
 from silicato.ports.targeting import InvalidTmuxTargetError, PaneEntry
@@ -41,6 +43,11 @@ def test_is_cuda_runtime_missing_true() -> None:
 def test_is_cuda_runtime_missing_false() -> None:
     err = RuntimeError("some unrelated runtime error")
     assert not is_cuda_runtime_missing(err)
+
+
+def test_is_cuda_runtime_missing_cublas_alloc_failed() -> None:
+    err = RuntimeError("cuBLAS failed with status CUBLAS_STATUS_ALLOC_FAILED")
+    assert is_cuda_runtime_missing(err)
 
 
 def test_resolve_tmux_target_prefers_cli() -> None:
@@ -89,6 +96,25 @@ def test_resolve_tmux_target_uses_env_when_available() -> None:
 
     assert result.target == "env:0.5"
     assert resolver.validated == ["env:0.5"]
+
+
+def test_resolve_tmux_target_invalid_env_target_fails_fast() -> None:
+    resolver = FakeTargetResolver()
+    resolver.should_fail_target = "bad:env"
+    resolver.panes = [PaneEntry(target="picked:0.1", command="bash", title="main")]
+    resolver.picked = "picked:0.1"
+    use_case = ResolveTargetUseCase(resolver)
+
+    with pytest.raises(InvalidTmuxTargetError):
+        use_case.execute(
+            explicit_target=None,
+            pick_target=False,
+            env_target="bad:env",
+            remembered_target="cfg:0.1",
+        )
+
+    assert resolver.list_panes_calls == 0
+    assert resolver.pick_calls == 0
 
 
 def test_resolve_tmux_target_uses_picker_by_default_even_when_env_or_config_exist() -> None:

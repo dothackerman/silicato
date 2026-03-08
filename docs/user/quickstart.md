@@ -61,6 +61,18 @@ Normal mode (direct send):
 silicato
 ```
 
+Spawn profile (hardware-aware preset for 3-4 parallel sessions):
+
+```bash
+silicato --spawn
+# alias for: silicato --profile spawn
+```
+
+Turn controls:
+- Press Enter to start recording.
+- Press Enter again to stop recording and transcribe.
+- Type `q` then Enter at the turn prompt to quit.
+
 Preview mode (explicit action before send):
 
 ```bash
@@ -98,6 +110,10 @@ Default resolution order:
 2. `SILICATO_TMUX_TARGET`
 3. remembered config target
 4. interactive picker
+
+Validation behavior in `--reuse-target` mode:
+- Invalid `SILICATO_TMUX_TARGET` fails fast with an error.
+- Invalid remembered config target warns and then falls back to interactive picker.
 
 Target format requirement:
 - Use pane-scoped targets only: `session:window.pane` (for example `codex:0.1`) or `%pane_id`.

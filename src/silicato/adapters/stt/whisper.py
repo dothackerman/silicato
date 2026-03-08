@@ -36,6 +36,8 @@ def is_cuda_runtime_missing(exc: Exception) -> bool:
         token in msg
         for token in (
             "libcublas",
+            "cublas_status_alloc_failed",
+            "cublas",
             "libcudnn",
             "cuda",
             "cannot be loaded",

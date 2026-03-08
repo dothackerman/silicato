@@ -30,6 +30,7 @@ Out of scope for this RC:
 
 ## Capabilities
 
+- Push-to-talk capture controls: press Enter to start recording, then Enter again to stop
 - Local speech capture via `arecord`
 - Local transcription via `faster-whisper`
 - Language selection: `en`, `de`, `auto`
@@ -37,6 +38,7 @@ Out of scope for this RC:
 - Normal mode: direct send after transcription without local transcript echo
 - Preview mode: review/edit/retry/skip/quit before send
 - Runtime diagnostics via `silicato --doctor`
+- Hardware-aware spawn profile via `silicato --spawn` for 3-4 parallel sessions
 - Local JSONL turn logging
 
 ## Limitations
@@ -93,6 +95,18 @@ Run normal mode:
 ```bash
 silicato
 ```
+
+Run spawn profile (recommended for 3-4 parallel instances on constrained GPUs):
+
+```bash
+silicato --spawn
+# alias for: silicato --profile spawn
+```
+
+Interactive turn controls:
+- Press Enter to start recording.
+- Press Enter again to stop recording and transcribe.
+- Type `q` then Enter at the turn prompt to quit.
 
 Run preview mode:
 
