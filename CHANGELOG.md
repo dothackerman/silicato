@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.0rc5] - 2026-03-10
+
+### Added
+- Guided local auto-stop tuning workflow with a structured bilingual fixture recorder and deterministic evaluator.
+- Replayable auto-stop fixture harness and regression coverage for endpoint behavior outside live ALSA capture.
+- User-facing auto-stop tuning guidance for quickly adjusting pause length and RMS sensitivity per microphone and room setup.
+
+### Changed
+- Tuned the default auto-stop behavior to `1.4` seconds of silence with RMS threshold `80` based on local fixture collection and live validation.
+- CLI now exposes `--silence-rms-threshold` so speech sensitivity can be tuned directly.
+- User and developer documentation synchronized around the new auto-stop defaults and local tuning workflow.
+- Bumped package version to `0.1.0rc5`.
+
 ## [0.1.0rc4] - 2026-03-08
 
 ### Added

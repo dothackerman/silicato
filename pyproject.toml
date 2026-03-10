@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "silicato"
-version = "0.1.0rc4"
+version = "0.1.0rc5"
 description = "Linux push-to-talk voice bridge to terminal AI agents running in tmux."
 readme = "README.md"
 license = "MIT"

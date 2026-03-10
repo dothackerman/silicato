@@ -117,8 +117,12 @@ def main() -> int:
         runtime.device,
         runtime.compute_type,
     )
-    silence_stop_seconds = getattr(args, "silence_stop_seconds", 1.8)
-    capture_adapter = AlsaCaptureAdapter(silence_stop_seconds=silence_stop_seconds)
+    silence_stop_seconds = getattr(args, "silence_stop_seconds", 1.4)
+    silence_rms_threshold = getattr(args, "silence_rms_threshold", 80)
+    capture_adapter = AlsaCaptureAdapter(
+        silence_stop_seconds=silence_stop_seconds,
+        silence_rms_threshold=silence_rms_threshold,
+    )
     stt_adapter = WhisperSttAdapter(model)
     run_capture_transcribe = RunCaptureTranscribeUseCase(capture_adapter, stt_adapter)
 

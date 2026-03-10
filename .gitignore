@@ -26,6 +26,7 @@ htmlcov/
 # Runtime output
 output/
 *.log
+tests/fixtures/auto_stop/local/
 
 # Local environment files
 .env

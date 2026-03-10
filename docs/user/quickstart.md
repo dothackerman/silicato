@@ -22,10 +22,10 @@ sudo apt install -y alsa-utils ffmpeg python3-venv tmux
 
 ## 3) Install Silicato
 
-### Option A: RC install from PyPI (`0.1.0rc4`)
+### Option A: RC install from PyPI (`0.1.0rc5`)
 
 ```bash
-pipx install silicato==0.1.0rc4
+pipx install silicato==0.1.0rc5
 ```
 
 ### Option B: install from source checkout
@@ -81,8 +81,19 @@ Turn controls:
 - Type `q` then Enter at the turn prompt to quit.
 
 Optional tuning:
-- `--silence-stop-seconds <seconds>` controls pause length before auto-stop (default `1.8`).
+- `--silence-stop-seconds <seconds>` controls pause length before auto-stop (default `1.4`).
+- `--silence-rms-threshold <value>` controls how quiet speech can get before auto-stop starts treating it as silence (default `80`).
 - `--silence-stop-seconds 0` disables auto-stop and requires manual Enter stop.
+
+Hot tip:
+- If recording ends too early, lower `--silence-rms-threshold` first.
+- If recording hangs on too long, raise `--silence-rms-threshold` or lower `--silence-stop-seconds`.
+- For local fine-tuning on your own microphone and room, use the guided fixture recorder and evaluator:
+
+```bash
+.venv/bin/python3 scripts/auto_stop_record.py --plan tests/fixtures/auto_stop/plans/de-en-core.toml --takes 2
+.venv/bin/python3 scripts/auto_stop_eval.py
+```
 
 Preview mode (explicit action before send):
 

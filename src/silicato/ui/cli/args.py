@@ -67,10 +67,19 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--silence-stop-seconds",
         type=float,
-        default=1.8,
+        default=1.4,
         help=(
-            "Auto-stop recording after this many silent seconds (default: 1.8). "
+            "Auto-stop recording after this many silent seconds (default: 1.4). "
             "Set to 0 to disable auto-stop and require Enter to stop."
+        ),
+    )
+    parser.add_argument(
+        "--silence-rms-threshold",
+        type=int,
+        default=80,
+        help=(
+            "RMS threshold used to classify frames as speech for auto-stop "
+            "(default: 80). Lower values are more tolerant of quiet speech."
         ),
     )
     parser.add_argument(

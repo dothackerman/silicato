@@ -1,0 +1,143 @@
+version = 1
+plan_id = "de-en-core"
+description = "Core bilingual prompt plan for auto-stop fixture collection. Run with --takes 2 to get a 40-recording starter set."
+
+[[prompt]]
+id = "en-normal-01"
+language = "en"
+script = "Please open the terminal and wait for my next instruction."
+instructions = "Speak at your normal pace in a quiet room."
+tags = ["english", "normal", "quiet-room"]
+
+[[prompt]]
+id = "en-slow-01"
+language = "en"
+script = "I want to think slowly and still finish this sentence naturally."
+instructions = "Speak slowly and deliberately."
+tags = ["english", "slow", "quiet-room"]
+
+[[prompt]]
+id = "en-pause-mid-01"
+language = "en"
+script = "Open the project, then check the tests, and only after that review the logs."
+instructions = "Pause naturally after 'project' before finishing the rest of the sentence."
+tags = ["english", "mid-pause", "quiet-room"]
+
+[[prompt]]
+id = "en-quiet-end-01"
+language = "en"
+script = "I think this should work if we keep the ending gentle."
+instructions = "End the sentence more quietly than you start it."
+tags = ["english", "quiet-ending", "quiet-room"]
+
+[[prompt]]
+id = "en-filler-01"
+language = "en"
+script = "So, um, I think we should probably keep this approach for now."
+instructions = "Include the filler words naturally."
+tags = ["english", "filler", "quiet-room"]
+
+[[prompt]]
+id = "en-long-01"
+language = "en"
+script = "I would like you to open the latest report, summarize the risks, and then suggest one conservative next step."
+instructions = "Say the full thought in one natural turn."
+tags = ["english", "long", "quiet-room"]
+
+[[prompt]]
+id = "en-noisy-01"
+language = "en"
+script = "Please note that there is a bit of background noise during this test."
+instructions = "Create mild background noise if practical, for example a fan or distant keyboard."
+tags = ["english", "noise", "background-noise"]
+
+[[prompt]]
+id = "en-soft-01"
+language = "en"
+script = "This one is intentionally softer, but it should still be captured correctly."
+instructions = "Speak more softly than usual without whispering."
+tags = ["english", "soft-voice", "quiet-room"]
+
+[[prompt]]
+id = "en-reflective-01"
+language = "en"
+script = "I think the better option is to wait, consider the tradeoffs, and then continue."
+instructions = "Use a reflective pace with one thoughtful pause before 'and then continue'."
+tags = ["english", "reflective", "quiet-room"]
+
+[[prompt]]
+id = "en-short-01"
+language = "en"
+script = "Run the tests now."
+instructions = "Say it briefly and clearly."
+tags = ["english", "short", "quiet-room"]
+
+[[prompt]]
+id = "de-normal-01"
+language = "de"
+script = "Bitte oeffne das Terminal und warte auf meine naechste Anweisung."
+instructions = "Sprich in normalem Tempo in einer ruhigen Umgebung."
+tags = ["german", "normal", "quiet-room"]
+
+[[prompt]]
+id = "de-langsam-01"
+language = "de"
+script = "Ich moechte langsam sprechen und diesen Satz trotzdem natuerlich beenden."
+instructions = "Sprich langsam und ueberlegt."
+tags = ["german", "slow", "quiet-room"]
+
+[[prompt]]
+id = "de-pause-mitte-01"
+language = "de"
+script = "Oeffne bitte das Projekt, pruefe dann die Tests und schau erst danach in die Logs."
+instructions = "Mache nach 'Projekt' eine natuerliche Pause."
+tags = ["german", "mid-pause", "quiet-room"]
+
+[[prompt]]
+id = "de-leises-ende-01"
+language = "de"
+script = "Ich glaube, das sollte funktionieren, wenn das Ende etwas leiser ist."
+instructions = "Beende den Satz etwas leiser als du ihn beginnst."
+tags = ["german", "quiet-ending", "quiet-room"]
+
+[[prompt]]
+id = "de-fuellwort-01"
+language = "de"
+script = "Also, hm, ich denke, wir sollten diesen Ansatz vorerst beibehalten."
+instructions = "Nutze die Fuellwoerter ganz natuerlich."
+tags = ["german", "filler", "quiet-room"]
+
+[[prompt]]
+id = "de-lang-01"
+language = "de"
+script = "Ich moechte, dass du den neuesten Bericht oeffnest, die Risiken zusammenfasst und danach einen vorsichtigen naechsten Schritt vorschlaegst."
+instructions = "Sprich den ganzen Gedanken in einem natuerlichen Turn."
+tags = ["german", "long", "quiet-room"]
+
+[[prompt]]
+id = "de-rauschen-01"
+language = "de"
+script = "Bitte beachte, dass bei diesem Test etwas Hintergrundgeraeusch vorhanden ist."
+instructions = "Erzeuge wenn moeglich leichtes Hintergrundgeraeusch, zum Beispiel einen Ventilator."
+tags = ["german", "noise", "background-noise"]
+
+[[prompt]]
+id = "de-leise-01"
+language = "de"
+script = "Dieser Durchgang ist bewusst leiser, sollte aber trotzdem sauber erkannt werden."
+instructions = "Sprich etwas leiser als sonst, aber nicht fluesternd."
+tags = ["german", "soft-voice", "quiet-room"]
+
+[[prompt]]
+id = "de-reflexiv-01"
+language = "de"
+script = "Ich denke, die bessere Option ist zu warten, die Abwaegungen zu bedenken und dann weiterzumachen."
+instructions = "Sprich nachdenklich und mache vor 'und dann weiterzumachen' eine kurze Pause."
+tags = ["german", "reflective", "quiet-room"]
+
+[[prompt]]
+id = "de-kurz-01"
+language = "de"
+script = "Fuehre die Tests jetzt aus."
+instructions = "Sprich kurz und klar."
+tags = ["german", "short", "quiet-room"]

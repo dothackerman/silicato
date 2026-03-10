@@ -22,8 +22,8 @@ class AlsaCaptureAdapter(AudioCapturePort):
     def __init__(
         self,
         *,
-        silence_stop_seconds: float = 1.8,
-        silence_rms_threshold: int = 500,
+        silence_stop_seconds: float = 1.4,
+        silence_rms_threshold: int = 80,
         poll_interval_seconds: float = 0.1,
     ) -> None:
         self._silence_stop_seconds = max(0.0, float(silence_stop_seconds))

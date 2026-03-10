@@ -22,6 +22,8 @@ def test_parse_args_supports_short_options() -> None:
             "44100",
             "--silence-stop-seconds",
             "2.5",
+            "--silence-rms-threshold",
+            "120",
             "-i",
             "hw:0,0",
             "-t",
@@ -41,6 +43,7 @@ def test_parse_args_supports_short_options() -> None:
     assert args.language == "de"
     assert args.sample_rate == 44100
     assert args.silence_stop_seconds == 2.5
+    assert args.silence_rms_threshold == 120
     assert args.input_device == "hw:0,0"
     assert args.tmux_target == "codex:0.1"
     assert args.no_remember_target is True
@@ -55,7 +58,8 @@ def test_parse_args_supports_short_options() -> None:
 def test_parse_args_picker_is_default_and_reuse_can_be_opted_in() -> None:
     default_args = parse_args([])
     assert default_args.pick_target is True
-    assert default_args.silence_stop_seconds == 1.8
+    assert default_args.silence_stop_seconds == 1.4
+    assert default_args.silence_rms_threshold == 80
 
     reuse_args = parse_args(["--reuse-target"])
     assert reuse_args.pick_target is False
@@ -93,6 +97,7 @@ def test_parse_args_help_text_mentions_target_modes_and_preview_actions(
     assert "s=skip" in out
     assert "q=quit" in out
     assert "--silence-stop-seconds" in out
+    assert "--silence-rms-threshold" in out
     assert "--profile" in out
     assert "--spawn" in out
 

@@ -46,6 +46,73 @@ class _FakeConfirmTurnUseCase:
         return None
 
 
+def test_main_passes_tuned_auto_stop_settings_into_capture_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from silicato.ui.cli import main as cli_main
+
+    args = Namespace(
+        model="base",
+        device="cpu",
+        compute_type="int8",
+        language="auto",
+        sample_rate=16000,
+        silence_stop_seconds=1.4,
+        silence_rms_threshold=80,
+        input_device=None,
+        tmux_target=None,
+        pick_target=True,
+        no_remember_target=False,
+        preview=False,
+        log_file=None,
+        once=False,
+        doctor=False,
+        profile=None,
+        spawn=False,
+    )
+
+    monkeypatch.setattr(cli_main, "parse_args", lambda: args)
+    monkeypatch.setattr(cli_main, "require_binary", lambda *_a, **_k: None)
+    monkeypatch.setattr(cli_main, "TomlConfigStore", _FakeConfigStore)
+    monkeypatch.setattr(cli_main, "TmuxTargetResolver", lambda: object())
+    monkeypatch.setattr(cli_main, "ResolveTargetUseCase", _FakeResolveTargetUseCase)
+    monkeypatch.setattr(cli_main, "TmuxSender", lambda *_a, **_k: object())
+    monkeypatch.setattr(cli_main, "SendTurnUseCase", lambda *_a, **_k: object())
+    monkeypatch.setattr(cli_main, "WhisperSttAdapter", lambda *_a, **_k: object())
+    monkeypatch.setattr(cli_main, "RunCaptureTranscribeUseCase", _FakeRunCaptureTranscribeUseCase)
+    monkeypatch.setattr(cli_main, "JsonlTurnLogger", lambda *_a, **_k: object())
+    monkeypatch.setattr(cli_main, "LogTurnUseCase", _FakeLogTurnUseCase)
+    monkeypatch.setattr(cli_main, "ConfirmTurnUseCase", _FakeConfirmTurnUseCase)
+    monkeypatch.setattr(cli_main, "prompt_turn_start", lambda: False)
+    monkeypatch.setattr(
+        cli_main,
+        "resolve_runtime_settings",
+        lambda **_k: RuntimeSettings(
+            model="base",
+            device="cpu",
+            compute_type="int8",
+            reason="manual settings",
+        ),
+    )
+    monkeypatch.setattr(cli_main, "build_model", lambda *_a, **_k: (object(), "cpu", "int8"))
+
+    captured_kwargs: dict[str, object] = {}
+
+    def _fake_capture_adapter(**kwargs: object) -> object:
+        captured_kwargs.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(cli_main, "AlsaCaptureAdapter", _fake_capture_adapter)
+
+    rc = cli_main.main()
+
+    assert rc == 0
+    assert captured_kwargs == {
+        "silence_stop_seconds": 1.4,
+        "silence_rms_threshold": 80,
+    }
+
+
 def test_main_uses_profile_resolved_model_settings(monkeypatch: pytest.MonkeyPatch) -> None:
     from silicato.ui.cli import main as cli_main
 
@@ -55,7 +122,8 @@ def test_main_uses_profile_resolved_model_settings(monkeypatch: pytest.MonkeyPat
         compute_type="float16",
         language="auto",
         sample_rate=16000,
-        silence_stop_seconds=1.8,
+        silence_stop_seconds=1.4,
+        silence_rms_threshold=80,
         input_device=None,
         tmux_target=None,
         pick_target=True,
@@ -120,7 +188,8 @@ def test_main_returns_nonzero_when_profile_plugin_resolution_fails(
         compute_type="float16",
         language="auto",
         sample_rate=16000,
-        silence_stop_seconds=1.8,
+        silence_stop_seconds=1.4,
+        silence_rms_threshold=80,
         input_device=None,
         tmux_target=None,
         pick_target=True,

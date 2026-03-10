@@ -2,7 +2,7 @@
 
 Silicato is a Linux voice bridge from push-to-talk microphone input to a selected AI-agent tmux pane.
 
-Current release candidate: `0.1.0rc4`.
+Current release candidate: `0.1.0rc5`.
 
 ## Supported Platforms
 
@@ -17,7 +17,7 @@ Validated baseline for this RC:
 
 ## Release Scope
 
-`0.1.0rc4` is intentionally limited to the current feature set:
+`0.1.0rc5` is intentionally limited to the current feature set:
 - Push-to-talk transcription flow
 - Optional preview mode (`--preview`) for `send/edit/retry/skip/quit`
 - Runtime profile plugins (built-in `spawn`, external plugin discovery via entry points)
@@ -54,10 +54,10 @@ Out of scope for this RC:
 
 ## Install
 
-### Install from PyPI (`0.1.0rc4`)
+### Install from PyPI (`0.1.0rc5`)
 
 ```bash
-pipx install silicato==0.1.0rc4
+pipx install silicato==0.1.0rc5
 ```
 
 ### Source install
@@ -118,8 +118,19 @@ Interactive turn controls:
 - Type `q` then Enter at the turn prompt to quit.
 
 Optional tuning:
-- `--silence-stop-seconds <seconds>` adjusts pause length before auto-stop (default `1.8`).
+- `--silence-stop-seconds <seconds>` adjusts pause length before auto-stop (default `1.4`).
+- `--silence-rms-threshold <value>` adjusts speech sensitivity for auto-stop (default `80`).
 - Set `--silence-stop-seconds 0` to disable auto-stop and require manual Enter stop.
+
+Hot tip:
+- If Silicato cuts you off too early, first try `--silence-rms-threshold 60` or `--silence-rms-threshold 40`.
+- If Silicato waits too long to stop, first try `--silence-rms-threshold 120` or reduce `--silence-stop-seconds` to `1.2`.
+- Use the guided local tuning workflow to collect and evaluate your own recordings:
+
+```bash
+.venv/bin/python3 scripts/auto_stop_record.py --plan tests/fixtures/auto_stop/plans/de-en-core.toml --takes 2
+.venv/bin/python3 scripts/auto_stop_eval.py
+```
 
 Run preview mode:
 

@@ -169,3 +169,27 @@ tests = [
   "tests/hardware/test_hardware_requirements.py::test_arecord_detects_capture_device",
   "tests/hardware/test_hardware_requirements.py::test_tmux_send_smoke_to_temp_pane",
 ]
+
+[[rule]]
+id = "BR-AUTOSTOP-001"
+statement = "Auto-stop endpoint detection is replayable deterministically against prerecorded fixtures so slow-speech regressions can be measured without live ALSA capture."
+owner_layer = "domain"
+requires_hardware = false
+tests = [
+  "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_stops_after_expected_silence_window",
+  "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_reports_no_speech_when_threshold_is_never_crossed",
+  "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_keeps_auto_stop_disabled_when_requested",
+  "tests/unit/test_auto_stop_evaluation.py::test_load_auto_stop_fixtures_resolves_root_relative_to_manifest",
+  "tests/unit/test_auto_stop_evaluation.py::test_evaluate_auto_stop_fixture_classifies_early_in_window_and_late",
+]
+
+[[rule]]
+id = "BR-AUTOSTOP-002"
+statement = "CLI exposes the tuned auto-stop defaults and wires pause length plus RMS threshold into capture configuration."
+owner_layer = "ui"
+requires_hardware = false
+tests = [
+  "tests/unit/test_cli_args.py::test_parse_args_picker_is_default_and_reuse_can_be_opted_in",
+  "tests/unit/test_cli_args.py::test_parse_args_help_text_mentions_target_modes_and_preview_actions",
+  "tests/unit/test_cli_main_profiles.py::test_main_passes_tuned_auto_stop_settings_into_capture_adapter",
+]
