@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 import tomllib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -154,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
             print("== Skipping local gate by request ==")
 
         print("== Dispatching release workflow ==")
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         dispatch_workflow(args.channel, args.version, args.ref)
 
         print("== Waiting for workflow run ==")
