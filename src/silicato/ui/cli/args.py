@@ -86,6 +86,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--max-recording-seconds",
+        type=float,
+        default=0.0,
+        help=(
+            "Hard stop fallback in seconds if silence auto-stop never triggers "
+            "(default: 0, disabled). Set above 0 to enable a cap."
+        ),
+    )
+    parser.add_argument(
         "-i",
         "--input-device",
         default=None,

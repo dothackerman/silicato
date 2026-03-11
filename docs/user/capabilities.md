@@ -4,7 +4,7 @@
 
 In scope:
 - Push-to-talk speech capture with Enter start and auto-stop on long pause (manual Enter stop remains available, tuned default: `1.4s` pause and RMS threshold `80`)
-- Deterministic max-duration fallback if silence stop never triggers
+- Optional deterministic max-duration fallback if silence stop never triggers (configurable via `--max-recording-seconds`, default disabled)
 - Local transcription via `faster-whisper`
 - Language selection: `de`, `en`, `auto`
 - tmux pane selection at startup by default, with optional env/config reuse mode

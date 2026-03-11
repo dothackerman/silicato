@@ -20,7 +20,7 @@ class AutoStopConfig:
     silence_stop_seconds: float = 1.4
     speech_rms_threshold: int = 80
     frame_bytes: int = 4096
-    max_recording_seconds: float = 30.0
+    max_recording_seconds: float = 0.0
 
 
 @dataclass(frozen=True)

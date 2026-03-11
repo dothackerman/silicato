@@ -59,6 +59,7 @@ def test_main_passes_tuned_auto_stop_settings_into_capture_adapter(
         sample_rate=16000,
         silence_stop_seconds=1.4,
         silence_rms_threshold=80,
+        max_recording_seconds=0.0,
         input_device=None,
         tmux_target=None,
         pick_target=True,
@@ -110,6 +111,7 @@ def test_main_passes_tuned_auto_stop_settings_into_capture_adapter(
     assert captured_kwargs == {
         "silence_stop_seconds": 1.4,
         "silence_rms_threshold": 80,
+        "max_recording_seconds": 0.0,
     }
 
 
@@ -124,6 +126,7 @@ def test_main_uses_profile_resolved_model_settings(monkeypatch: pytest.MonkeyPat
         sample_rate=16000,
         silence_stop_seconds=1.4,
         silence_rms_threshold=80,
+        max_recording_seconds=0.0,
         input_device=None,
         tmux_target=None,
         pick_target=True,
@@ -190,6 +193,7 @@ def test_main_returns_nonzero_when_profile_plugin_resolution_fails(
         sample_rate=16000,
         silence_stop_seconds=1.4,
         silence_rms_threshold=80,
+        max_recording_seconds=0.0,
         input_device=None,
         tmux_target=None,
         pick_target=True,

@@ -36,3 +36,5 @@ When a decision changes:
 2. [ADR-0002 Turn State Machine](ADR-0002-turn-state-machine.md)
 3. [ADR-0003 Knowledge Gradient and Onboarding](ADR-0003-knowledge-gradient-and-onboarding.md)
 4. [ADR-0004 Architecture Enforcement in Gate](ADR-0004-architecture-enforcement-in-gate.md)
+5. [ADR-0005 Bounded Recording and Fallback Policy](ADR-0005-bounded-recording-and-fallback-policy.md)
+6. [ADR-0006 Max Recording Default Disabled](ADR-0006-max-recording-default-disabled.md)

@@ -79,12 +79,13 @@ Turn controls:
 - Recording stops automatically after a long pause in speech.
 - Press Enter during recording to stop manually.
 - Type `q` then Enter at the turn prompt to quit.
-- A fixed max-duration fallback still stops runaway capture if silence detection never triggers.
+- No max-duration cap is enforced by default.
 
 Optional tuning:
 - `--silence-stop-seconds <seconds>` controls pause length before auto-stop (default `1.4`).
 - `--silence-rms-threshold <value>` controls how quiet speech can get before auto-stop starts treating it as silence (default `80`).
-- `--silence-stop-seconds 0` disables silence-based stop, but the fixed max-duration fallback still prevents hangs.
+- `--max-recording-seconds <seconds>` enables a hard-stop fallback when set above `0` (default `0`, disabled).
+- `--silence-stop-seconds 0` disables silence-based stop.
 
 Hot tip:
 - If recording ends too early, lower `--silence-rms-threshold` first.

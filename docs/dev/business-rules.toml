@@ -226,7 +226,7 @@ tests = [
 
 [[rule]]
 id = "BR-AUTOSTOP-002"
-statement = "CLI exposes the tuned auto-stop defaults and wires pause length plus RMS threshold into capture configuration."
+statement = "CLI exposes tuned auto-stop defaults and wires pause length, RMS threshold, and max-duration fallback control (disabled by default) into capture configuration."
 owner_layer = "ui"
 requires_hardware = false
 tests = [

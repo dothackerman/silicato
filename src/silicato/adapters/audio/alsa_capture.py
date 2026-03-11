@@ -27,7 +27,7 @@ class AlsaCaptureAdapter(AudioCapturePort):
         *,
         silence_stop_seconds: float = 1.4,
         silence_rms_threshold: int = 80,
-        max_recording_seconds: float = 30.0,
+        max_recording_seconds: float = 0.0,
         poll_interval_seconds: float = 0.1,
     ) -> None:
         self._auto_stop_settings = AudioAutoStopSettings(
