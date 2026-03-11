@@ -9,6 +9,7 @@ from silicato.application.use_cases.run_capture_transcribe import (
     TurnConfig,
 )
 from silicato.domain.confirm_actions import parse_confirm_action
+from silicato.ports.audio import AudioChunkObserver
 from silicato.ports.storage import SilicatoConfig
 from silicato.ports.stt import TranscriptResult
 from silicato.ports.targeting import PaneEntry
@@ -18,11 +19,18 @@ class CaptureAdapter:
     def __init__(self) -> None:
         self.calls = 0
 
-    def record_once(self, output_path: Path, sample_rate: int, input_device: str | None) -> None:
+    def record_once(
+        self,
+        output_path: Path,
+        sample_rate: int,
+        input_device: str | None,
+        on_chunk: AudioChunkObserver | None = None,
+    ) -> None:
         self.calls += 1
         output_path.write_bytes(b"RIFF....WAVE")
         _ = sample_rate
         _ = input_device
+        _ = on_chunk
 
 
 class SttAdapter:

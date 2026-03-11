@@ -8,6 +8,7 @@ from silicato.application.use_cases.run_capture_transcribe import (
 )
 from silicato.application.use_cases.send_turn import SendTurnUseCase
 from silicato.domain.confirm_actions import parse_confirm_action
+from silicato.ports.audio import AudioChunkObserver
 from silicato.ports.stt import TranscriptResult
 
 
@@ -15,11 +16,18 @@ class FakeCapture:
     def __init__(self) -> None:
         self.called = False
 
-    def record_once(self, output_path: Path, sample_rate: int, input_device: str | None) -> None:
+    def record_once(
+        self,
+        output_path: Path,
+        sample_rate: int,
+        input_device: str | None,
+        on_chunk: AudioChunkObserver | None = None,
+    ) -> None:
         self.called = True
         output_path.write_bytes(b"RIFF....WAVE")
         _ = sample_rate
         _ = input_device
+        _ = on_chunk
 
 
 class FakeStt:

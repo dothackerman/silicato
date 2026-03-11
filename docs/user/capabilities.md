@@ -4,10 +4,13 @@
 
 In scope:
 - Push-to-talk speech capture with Enter start and auto-stop on long pause (manual Enter stop remains available, tuned default: `1.4s` pause and RMS threshold `80`)
+- Deterministic max-duration fallback if silence stop never triggers
 - Local transcription via `faster-whisper`
 - Language selection: `de`, `en`, `auto`
 - tmux pane selection at startup by default, with optional env/config reuse mode
 - Reuse mode validation: invalid `SILICATO_TMUX_TARGET` exits with error; invalid remembered target falls back to picker
+- Named pane routing via `silicato route`
+- Direct prompt injection via `silicato inject --to <id>`
 - Normal mode direct send after transcription (without local transcript echo)
 - Preview mode (`--preview`) with `send/edit/retry/skip/quit`
 - Local JSONL turn logs

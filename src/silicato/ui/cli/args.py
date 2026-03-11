@@ -17,6 +17,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
   silicato
   silicato --reuse-target
   silicato -t codex:0.1 -p
+  silicato route add gaia codex:0.1
+  silicato route list
+  silicato inject --to gaia --text "hello"
   silicato --doctor
   silicato --spawn
   silicato --profile my-custom-plugin
@@ -156,6 +159,78 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--doctor",
         action="store_true",
         help="Print local environment checks and exit.",
+    )
+    subparsers = parser.add_subparsers(dest="command")
+
+    route_parser = subparsers.add_parser(
+        "route",
+        help="Manage named tmux pane routes.",
+    )
+    route_subparsers = route_parser.add_subparsers(dest="route_command", required=True)
+
+    route_add = route_subparsers.add_parser(
+        "add",
+        help="Create a named route.",
+    )
+    route_add.add_argument("identifier", help="Stable route identifier (for example gaia).")
+    route_add.add_argument("tmux_target", help="Pane-scoped tmux target.")
+    route_add.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite an existing route binding.",
+    )
+
+    route_update = route_subparsers.add_parser(
+        "update",
+        help="Update an existing named route.",
+    )
+    route_update.add_argument("identifier", help="Existing route identifier.")
+    route_update.add_argument("tmux_target", help="New pane-scoped tmux target.")
+
+    route_remove = route_subparsers.add_parser(
+        "remove",
+        help="Delete a named route.",
+    )
+    route_remove.add_argument("identifier", help="Existing route identifier.")
+
+    route_resolve = route_subparsers.add_parser(
+        "resolve",
+        help="Print the tmux target for a named route.",
+    )
+    route_resolve.add_argument("identifier", help="Existing route identifier.")
+
+    route_check = route_subparsers.add_parser(
+        "check",
+        help="Validate a named route against the current tmux runtime.",
+    )
+    route_check.add_argument("identifier", help="Existing route identifier.")
+
+    route_subparsers.add_parser(
+        "list",
+        help="List all named routes.",
+    )
+
+    inject_parser = subparsers.add_parser(
+        "inject",
+        help="Send text to a named route without entering the voice capture flow.",
+    )
+    inject_parser.add_argument(
+        "--to",
+        dest="route_identifier",
+        required=True,
+        help="Named route identifier.",
+    )
+    inject_source = inject_parser.add_mutually_exclusive_group(required=True)
+    inject_source.add_argument(
+        "--text",
+        dest="inject_text",
+        help="Literal text to send.",
+    )
+    inject_source.add_argument(
+        "--from-file",
+        dest="inject_from_file",
+        type=Path,
+        help="Read text to send from a file.",
     )
     args = parser.parse_args(argv)
     if args.spawn:

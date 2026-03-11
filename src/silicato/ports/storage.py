@@ -22,6 +22,13 @@ class TurnLogEvent:
     sent: bool
 
 
+@dataclass(frozen=True)
+class NamedPaneRoute:
+    identifier: str
+    tmux_target: str
+    updated_at: str
+
+
 class ConfigStorePort(Protocol):
     """Capability for loading/saving user configuration."""
 
@@ -34,3 +41,15 @@ class TurnLoggerPort(Protocol):
     """Capability for appending structured turn events."""
 
     def append(self, event: TurnLogEvent) -> Path: ...
+
+
+class RouteStorePort(Protocol):
+    """Capability for persisting named tmux pane routes."""
+
+    def list_routes(self) -> tuple[NamedPaneRoute, ...]: ...
+
+    def get(self, identifier: str) -> NamedPaneRoute | None: ...
+
+    def upsert(self, route: NamedPaneRoute) -> Path: ...
+
+    def delete(self, identifier: str) -> Path | None: ...

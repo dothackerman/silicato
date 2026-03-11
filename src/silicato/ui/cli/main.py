@@ -5,25 +5,41 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
+from argparse import Namespace
 from pathlib import Path
 
 from silicato.adapters.audio.alsa_capture import AlsaCaptureAdapter
 from silicato.adapters.storage.config_store import TomlConfigStore
 from silicato.adapters.storage.jsonl_turn_logger import JsonlTurnLogger
+from silicato.adapters.storage.route_store import TomlRouteStore
 from silicato.adapters.stt.whisper import WhisperSttAdapter, build_model, is_cuda_runtime_missing
 from silicato.adapters.tmux.sender import TmuxSender
 from silicato.adapters.tmux.target_resolver import TmuxTargetResolver
 from silicato.application.use_cases.confirm_turn import ConfirmTurnUseCase
 from silicato.application.use_cases.log_turn import LogTurnUseCase
+from silicato.application.use_cases.manage_routes import (
+    CheckRouteUseCase,
+    ListRoutesUseCase,
+    RemoveRouteUseCase,
+    ResolveRouteUseCase,
+    RouteAlreadyExistsError,
+    RouteManagementError,
+    RouteNotFoundError,
+    SaveRouteUseCase,
+)
 from silicato.application.use_cases.resolve_target import ResolveTargetUseCase
 from silicato.application.use_cases.run_capture_transcribe import (
     RunCaptureTranscribeUseCase,
     TurnConfig,
 )
 from silicato.application.use_cases.send_turn import SendTurnUseCase
-from silicato.ports.storage import SilicatoConfig
+from silicato.ports.storage import NamedPaneRoute, SilicatoConfig
 from silicato.ports.stt import TranscriptResult
-from silicato.ports.targeting import InvalidTmuxTargetError, NoTmuxSessionError, PickerAbortedError
+from silicato.ports.targeting import (
+    InvalidTmuxTargetError,
+    NoTmuxSessionError,
+    PickerAbortedError,
+)
 from silicato.ui.cli.args import parse_args
 from silicato.ui.cli.prompts import prompt_confirm, prompt_edit_text, prompt_turn_start
 from silicato.ui.cli.runtime_checks import require_binary, run_doctor
@@ -53,10 +69,148 @@ def _maybe_log(
         print(f"Warning: could not write log file: {exc}", file=sys.stderr)
 
 
+def _print_route(route: NamedPaneRoute) -> None:
+    print(f"{route.identifier}\t{route.tmux_target}\t{route.updated_at}")
+
+
+def _load_inject_text(args: Namespace) -> str:
+    inject_text = getattr(args, "inject_text", None)
+    if inject_text is not None:
+        return str(inject_text)
+
+    inject_from_file = getattr(args, "inject_from_file", None)
+    if inject_from_file is None:
+        raise RuntimeError("inject requires either --text or --from-file")
+    try:
+        return Path(inject_from_file).read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RuntimeError(f"Could not read inject file '{inject_from_file}': {exc}") from exc
+
+
+def _handle_route_command(args: Namespace) -> int:
+    store = TomlRouteStore()
+    route_command = getattr(args, "route_command", None)
+    identifier = getattr(args, "identifier", None)
+    target = getattr(args, "tmux_target", None)
+
+    try:
+        if route_command == "list":
+            routes = ListRoutesUseCase(store).execute()
+            if not routes:
+                print("No named routes configured.")
+                return 0
+            for route in routes:
+                _print_route(route)
+            return 0
+
+        if route_command == "add":
+            result = SaveRouteUseCase(store).execute(
+                identifier=str(identifier),
+                tmux_target=str(target),
+                allow_overwrite=bool(getattr(args, "force", False)),
+            )
+            action = "Created" if result.created else "Updated"
+            print(f"{action} route '{result.route.identifier}' -> {result.route.tmux_target}.")
+            return 0
+
+        if route_command == "update":
+            ResolveRouteUseCase(store).execute(str(identifier))
+            result = SaveRouteUseCase(store).execute(
+                identifier=str(identifier),
+                tmux_target=str(target),
+                allow_overwrite=True,
+            )
+            print(f"Updated route '{result.route.identifier}' -> {result.route.tmux_target}.")
+            return 0
+
+        if route_command == "remove":
+            removed = RemoveRouteUseCase(store).execute(str(identifier))
+            if not removed:
+                raise RouteNotFoundError(f"route '{identifier}' was not found")
+            print(f"Removed route '{identifier}'.")
+            return 0
+
+        if route_command == "resolve":
+            route = ResolveRouteUseCase(store).execute(str(identifier))
+            print(route.tmux_target)
+            return 0
+
+        if route_command == "check":
+            require_binary("tmux", apt_package="tmux")
+            resolver = TmuxTargetResolver()
+            route = CheckRouteUseCase(store, resolver).execute(str(identifier))
+            print(f"Route '{route.identifier}' is valid for tmux target '{route.tmux_target}'.")
+            return 0
+    except RouteAlreadyExistsError as exc:
+        print(f"Route error: {exc}. Use --force to overwrite.", file=sys.stderr)
+        return 1
+    except RouteManagementError as exc:
+        print(f"Route error: {exc}", file=sys.stderr)
+        return 1
+    except NoTmuxSessionError:
+        TmuxTargetResolver().print_no_tmux_guidance()
+        return 1
+    except InvalidTmuxTargetError as exc:
+        print(f"Invalid tmux target: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"Unknown route command: {route_command}", file=sys.stderr)
+    return 1
+
+
+def _handle_inject_command(args: Namespace) -> int:
+    require_binary("tmux", apt_package="tmux")
+    store = TomlRouteStore()
+    resolver = TmuxTargetResolver()
+    route_identifier = args.route_identifier
+
+    try:
+        route = CheckRouteUseCase(store, resolver).execute(str(route_identifier))
+        text = _load_inject_text(args)
+    except RouteNotFoundError as exc:
+        print(f"Route error: {exc}. Use 'silicato route add' to bind it first.", file=sys.stderr)
+        return 1
+    except RouteManagementError as exc:
+        print(f"Route error: {exc}", file=sys.stderr)
+        return 1
+    except NoTmuxSessionError:
+        resolver.print_no_tmux_guidance()
+        return 1
+    except InvalidTmuxTargetError as exc:
+        print(
+            f"Invalid tmux target for route '{route_identifier}': {exc}. "
+            "Use 'silicato route update' to rebind it.",
+            file=sys.stderr,
+        )
+        return 1
+    except RuntimeError as exc:
+        print(f"Inject error: {exc}", file=sys.stderr)
+        return 1
+
+    if not text.strip():
+        print("Inject error: text payload cannot be empty.", file=sys.stderr)
+        return 1
+
+    try:
+        SendTurnUseCase(TmuxSender(route.tmux_target)).execute(text)
+    except Exception as exc:  # noqa: BLE001
+        print(f"Inject error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"Sent text to route '{route.identifier}' ({route.tmux_target}).")
+    return 0
+
+
 def main() -> int:
     args = parse_args()
     if args.doctor:
         return run_doctor()
+
+    command = getattr(args, "command", None)
+    if command == "route":
+        return _handle_route_command(args)
+    if command == "inject":
+        return _handle_inject_command(args)
 
     require_binary("arecord", apt_package="alsa-utils")
     require_binary("tmux", apt_package="tmux")

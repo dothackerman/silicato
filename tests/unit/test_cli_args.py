@@ -80,6 +80,30 @@ def test_parse_args_accepts_custom_profile_plugin_name() -> None:
     assert profile_args.profile == "eco"
 
 
+def test_parse_args_supports_route_management_subcommands() -> None:
+    add_args = parse_args(["route", "add", "gaia", "codex:0.1", "--force"])
+    assert add_args.command == "route"
+    assert add_args.route_command == "add"
+    assert add_args.identifier == "gaia"
+    assert add_args.tmux_target == "codex:0.1"
+    assert add_args.force is True
+
+    list_args = parse_args(["route", "list"])
+    assert list_args.command == "route"
+    assert list_args.route_command == "list"
+
+
+def test_parse_args_supports_named_route_injection() -> None:
+    text_args = parse_args(["inject", "--to", "gaia", "--text", "hello"])
+    assert text_args.command == "inject"
+    assert text_args.route_identifier == "gaia"
+    assert text_args.inject_text == "hello"
+    assert text_args.inject_from_file is None
+
+    file_args = parse_args(["inject", "--to", "gaia", "--from-file", "/tmp/prompt.txt"])
+    assert file_args.inject_from_file == Path("/tmp/prompt.txt")
+
+
 def test_parse_args_help_text_mentions_target_modes_and_preview_actions(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -100,6 +124,8 @@ def test_parse_args_help_text_mentions_target_modes_and_preview_actions(
     assert "--silence-rms-threshold" in out
     assert "--profile" in out
     assert "--spawn" in out
+    assert "route add gaia" in out
+    assert "inject --to gaia" in out
 
 
 def test_parse_args_help_text_lists_discovered_runtime_plugins(

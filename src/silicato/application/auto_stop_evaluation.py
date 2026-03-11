@@ -9,7 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from silicato.domain.auto_stop import AutoStopConfig, AutoStopDecision, evaluate_pcm16le_auto_stop
+from silicato.domain.auto_stop import (
+    AutoStopConfig,
+    AutoStopDecision,
+    evaluate_rms_frames,
+    iter_rms_frames_s16le,
+)
 
 AutoStopOutcome = Literal["early", "in_window", "late", "no_stop"]
 _FLOAT_EPSILON = 1e-9
@@ -102,9 +107,12 @@ def evaluate_auto_stop_fixture(
     """Evaluate one fixture against the provided endpointing settings."""
 
     sample_rate_hz, pcm_bytes = _read_mono_s16le_wav(fixture.wav_path)
-    decision = evaluate_pcm16le_auto_stop(
-        pcm_bytes,
-        sample_rate_hz=sample_rate_hz,
+    decision = evaluate_rms_frames(
+        iter_rms_frames_s16le(
+            pcm_bytes,
+            sample_rate_hz=sample_rate_hz,
+            config=config,
+        ),
         config=config,
     )
     outcome, penalty_seconds = _score_decision(decision, fixture)

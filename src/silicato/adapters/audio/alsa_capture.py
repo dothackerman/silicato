@@ -2,18 +2,21 @@
 
 from __future__ import annotations
 
-import array
-import math
 import os
 import select
 import signal
 import subprocess
 import sys
-import time
 import wave
 from pathlib import Path
 
-from silicato.ports.audio import AudioCapturePort
+from silicato.ports.audio import (
+    AudioAutoStopSettings,
+    AudioCapturePort,
+    AudioChunkDecision,
+    AudioChunkObservation,
+    AudioChunkObserver,
+)
 
 
 class AlsaCaptureAdapter(AudioCapturePort):
@@ -24,13 +27,24 @@ class AlsaCaptureAdapter(AudioCapturePort):
         *,
         silence_stop_seconds: float = 1.4,
         silence_rms_threshold: int = 80,
+        max_recording_seconds: float = 30.0,
         poll_interval_seconds: float = 0.1,
     ) -> None:
-        self._silence_stop_seconds = max(0.0, float(silence_stop_seconds))
-        self._silence_rms_threshold = max(1, int(silence_rms_threshold))
+        self._auto_stop_settings = AudioAutoStopSettings(
+            silence_stop_seconds=max(0.0, float(silence_stop_seconds)),
+            speech_rms_threshold=max(1, int(silence_rms_threshold)),
+            frame_bytes=4096,
+            max_recording_seconds=max(0.0, float(max_recording_seconds)),
+        )
         self._poll_interval_seconds = max(0.02, float(poll_interval_seconds))
 
-    def record_once(self, output_path: Path, sample_rate: int, input_device: str | None) -> None:
+    def record_once(
+        self,
+        output_path: Path,
+        sample_rate: int,
+        input_device: str | None,
+        on_chunk: AudioChunkObserver | None = None,
+    ) -> None:
         cmd = [
             "arecord",
             "-q",
@@ -54,7 +68,12 @@ class AlsaCaptureAdapter(AudioCapturePort):
 
         captured_pcm = bytearray()
         try:
-            self._wait_for_stop(proc, captured_pcm)
+            self._wait_for_stop(
+                proc,
+                captured_pcm,
+                sample_rate=sample_rate,
+                on_chunk=on_chunk,
+            )
         except KeyboardInterrupt:
             pass
         finally:
@@ -106,22 +125,28 @@ class AlsaCaptureAdapter(AudioCapturePort):
         except OSError as exc:
             raise RuntimeError(f"Could not read temporary recording: {exc}") from exc
 
-    def _wait_for_stop(self, proc: subprocess.Popen[bytes], captured_pcm: bytearray) -> None:
+    def _wait_for_stop(
+        self,
+        proc: subprocess.Popen[bytes],
+        captured_pcm: bytearray,
+        *,
+        sample_rate: int,
+        on_chunk: AudioChunkObserver | None,
+    ) -> None:
         if proc.stdout is None:
             return
-        if self._silence_stop_seconds <= 0:
+        if self._auto_stop_settings.silence_stop_seconds <= 0:
             print("Recording started. Speak now, then press Enter to stop.")
         else:
             print(
                 "Recording started. Speak now. "
-                f"Auto-stop after {self._silence_stop_seconds:.1f}s of silence "
+                f"Auto-stop after {self._auto_stop_settings.silence_stop_seconds:.1f}s of silence "
                 "(press Enter to stop manually)."
             )
 
-        speech_seen = False
-        last_voice_at: float | None = None
         stdin_fd = _stdin_fd_if_tty()
         stdout_fd = proc.stdout.fileno()
+        elapsed_seconds = 0.0
 
         while proc.poll() is None:
             watched: list[int] = [stdout_fd]
@@ -135,23 +160,28 @@ class AlsaCaptureAdapter(AudioCapturePort):
 
             pcm_chunk = b""
             if stdout_fd in readable:
-                pcm_chunk = os.read(stdout_fd, 4096)
+                pcm_chunk = os.read(stdout_fd, self._auto_stop_settings.frame_bytes)
             if pcm_chunk:
                 captured_pcm.extend(pcm_chunk)
-                rms = _rms_s16le(pcm_chunk)
-                now = time.monotonic()
-                if rms >= self._silence_rms_threshold:
-                    speech_seen = True
-                    last_voice_at = now
-                elif self._silence_stop_seconds > 0 and speech_seen and last_voice_at is not None:
-                    if now - last_voice_at >= self._silence_stop_seconds:
+                sample_count = len(pcm_chunk) // 2
+                if sample_count <= 0:
+                    continue
+                elapsed_seconds += sample_count / sample_rate
+                if on_chunk is not None:
+                    decision = on_chunk(
+                        AudioChunkObservation(
+                            pcm_bytes=pcm_chunk,
+                            end_time_seconds=elapsed_seconds,
+                            auto_stop_settings=self._auto_stop_settings,
+                        )
+                    )
+                    if isinstance(decision, AudioChunkDecision) and decision.stop:
+                        if decision.reason == "max_duration":
+                            print(
+                                "Recording stopped at the max duration fallback "
+                                f"({self._auto_stop_settings.max_recording_seconds:.1f}s)."
+                            )
                         return
-            elif speech_seen and last_voice_at is not None:
-                if (
-                    self._silence_stop_seconds > 0
-                    and time.monotonic() - last_voice_at >= self._silence_stop_seconds
-                ):
-                    return
 
             if not readable:
                 continue
@@ -172,20 +202,3 @@ def _consume_stdin_line() -> None:
         sys.stdin.readline()
     except OSError:
         return
-
-
-def _rms_s16le(pcm_chunk: bytes) -> int:
-    if len(pcm_chunk) < 2:
-        return 0
-    if len(pcm_chunk) % 2 == 1:
-        pcm_chunk = pcm_chunk[:-1]
-    if not pcm_chunk:
-        return 0
-    samples = array.array("h")
-    samples.frombytes(pcm_chunk)
-    if sys.byteorder != "little":
-        samples.byteswap()
-    if not samples:
-        return 0
-    square_sum = sum(sample * sample for sample in samples)
-    return int(math.sqrt(square_sum / len(samples)))

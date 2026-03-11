@@ -16,13 +16,15 @@ tests = [
 
 [[rule]]
 id = "BR-CLI-001"
-statement = "CLI supports short option aliases, dynamic runtime plugin helper text, and keeps picker as default startup behavior."
+statement = "CLI supports short option aliases, named-route subcommands, direct route injection, dynamic runtime plugin helper text, and keeps picker as default startup behavior."
 owner_layer = "ui"
 requires_hardware = false
 tests = [
   "tests/unit/test_cli_args.py::test_parse_args_supports_short_options",
   "tests/unit/test_cli_args.py::test_parse_args_picker_is_default_and_reuse_can_be_opted_in",
   "tests/unit/test_cli_args.py::test_parse_args_accepts_custom_profile_plugin_name",
+  "tests/unit/test_cli_args.py::test_parse_args_supports_route_management_subcommands",
+  "tests/unit/test_cli_args.py::test_parse_args_supports_named_route_injection",
   "tests/unit/test_cli_args.py::test_parse_args_help_text_mentions_target_modes_and_preview_actions",
   "tests/unit/test_cli_args.py::test_parse_args_help_text_lists_discovered_runtime_plugins",
 ]
@@ -110,6 +112,41 @@ tests = [
 ]
 
 [[rule]]
+id = "BR-ROUTE-001"
+statement = "Named pane routes normalize identifiers, require explicit overwrite for rebinding, resolve deterministically, and reuse tmux target validation through the targeting boundary."
+owner_layer = "application"
+requires_hardware = false
+tests = [
+  "tests/unit/test_route_use_cases.py::test_normalize_route_identifier_lowercases_and_trims",
+  "tests/unit/test_route_use_cases.py::test_normalize_route_identifier_rejects_invalid_values",
+  "tests/unit/test_route_use_cases.py::test_save_route_requires_overwrite_for_different_target",
+  "tests/unit/test_route_use_cases.py::test_resolve_route_raises_when_missing",
+  "tests/unit/test_route_use_cases.py::test_check_route_reuses_target_resolver_validation",
+]
+
+[[rule]]
+id = "BR-ROUTE-002"
+statement = "Named pane routes persist in a TOML store, round-trip deterministically, and reject duplicate identifiers."
+owner_layer = "adapters"
+requires_hardware = false
+tests = [
+  "tests/contracts/test_route_store_contract.py::test_route_store_contract_round_trip_and_sorting",
+  "tests/contracts/test_route_store_contract.py::test_route_store_contract_missing_file_returns_empty_collection",
+  "tests/contracts/test_route_store_contract.py::test_route_store_contract_delete_removes_route",
+  "tests/unit/test_route_store.py::test_route_store_rejects_duplicate_identifiers",
+]
+
+[[rule]]
+id = "BR-ROUTE-003"
+statement = "Merger-owned CLI dispatches named route add and inject commands through the route store and sender boundaries."
+owner_layer = "ui"
+requires_hardware = false
+tests = [
+  "tests/unit/test_cli_main_routes.py::test_main_dispatches_route_add",
+  "tests/unit/test_cli_main_routes.py::test_main_dispatches_named_route_injection",
+]
+
+[[rule]]
 id = "BR-STT-001"
 statement = "CUDA runtime failure detection remains stable for fallback decision logic."
 owner_layer = "adapters"
@@ -172,15 +209,19 @@ tests = [
 
 [[rule]]
 id = "BR-AUTOSTOP-001"
-statement = "Auto-stop endpoint detection is replayable deterministically against prerecorded fixtures so slow-speech regressions can be measured without live ALSA capture."
+statement = "Auto-stop endpoint detection is replayable through one shared incremental detector for offline fixtures and live chunk callbacks, including max-duration fallback."
 owner_layer = "domain"
 requires_hardware = false
 tests = [
   "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_stops_after_expected_silence_window",
   "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_reports_no_speech_when_threshold_is_never_crossed",
   "tests/unit/test_auto_stop_detector.py::test_evaluate_rms_frames_keeps_auto_stop_disabled_when_requested",
+  "tests/unit/test_auto_stop_detector.py::test_incremental_detector_matches_batch_evaluation",
+  "tests/unit/test_auto_stop_detector.py::test_incremental_detector_stops_at_max_duration",
   "tests/unit/test_auto_stop_evaluation.py::test_load_auto_stop_fixtures_resolves_root_relative_to_manifest",
   "tests/unit/test_auto_stop_evaluation.py::test_evaluate_auto_stop_fixture_classifies_early_in_window_and_late",
+  "tests/unit/test_auto_stop_live_unification.py::test_run_capture_transcribe_uses_shared_detector_callback_for_live_chunks",
+  "tests/unit/test_auto_stop_live_unification.py::test_run_capture_transcribe_uses_shared_max_duration_fallback_for_live_chunks",
 ]
 
 [[rule]]

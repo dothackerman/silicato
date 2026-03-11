@@ -79,11 +79,12 @@ Turn controls:
 - Recording stops automatically after a long pause in speech.
 - Press Enter during recording to stop manually.
 - Type `q` then Enter at the turn prompt to quit.
+- A fixed max-duration fallback still stops runaway capture if silence detection never triggers.
 
 Optional tuning:
 - `--silence-stop-seconds <seconds>` controls pause length before auto-stop (default `1.4`).
 - `--silence-rms-threshold <value>` controls how quiet speech can get before auto-stop starts treating it as silence (default `80`).
-- `--silence-stop-seconds 0` disables auto-stop and requires manual Enter stop.
+- `--silence-stop-seconds 0` disables silence-based stop, but the fixed max-duration fallback still prevents hangs.
 
 Hot tip:
 - If recording ends too early, lower `--silence-rms-threshold` first.
@@ -141,7 +142,32 @@ Target format requirement:
 - Use pane-scoped targets only: `session:window.pane` (for example `codex:0.1`) or `%pane_id`.
 - Window/session-scoped targets (for example `codex:0`) are rejected to avoid cross-pane collisions.
 
-## 8) Optional model download auth
+## 8) Named routes and direct injection
+
+Bind a stable identifier to a pane:
+
+```bash
+silicato route add gaia codex:0.1
+silicato route list
+silicato route check gaia
+```
+
+Update, resolve, or remove a route:
+
+```bash
+silicato route update gaia codex:0.2
+silicato route resolve gaia
+silicato route remove gaia
+```
+
+Send text directly to a named route without recording audio:
+
+```bash
+silicato inject --to gaia --text "status check"
+silicato inject --to gaia --from-file ./prompt.txt
+```
+
+## 9) Optional model download auth
 
 If Hugging Face warns about anonymous download limits:
 

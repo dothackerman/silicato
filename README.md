@@ -20,6 +20,7 @@ Validated baseline for this RC:
 `0.1.0rc5` is intentionally limited to the current feature set:
 - Push-to-talk transcription flow
 - Optional preview mode (`--preview`) for `send/edit/retry/skip/quit`
+- Named tmux pane routing plus prompt injection by route identifier
 - Runtime profile plugins (built-in `spawn`, external plugin discovery via entry points)
 - Required tmux + terminal agent CLI workflow
 - Existing target resolution, config persistence, JSONL logging, and doctor diagnostics
@@ -32,10 +33,13 @@ Out of scope for this RC:
 ## Capabilities
 
 - Push-to-talk capture controls: press Enter to start recording, then auto-stop after a long pause (Enter still stops manually)
+- Deterministic max-duration fallback so capture does not hang indefinitely
 - Local speech capture via `arecord`
 - Local transcription via `faster-whisper`
 - Language selection: `en`, `de`, `auto`
 - tmux pane target selection via interactive picker by default (`--reuse-target` to opt into env/config fallback)
+- Named tmux pane routing via `silicato route ...`
+- Prompt injection to a named route via `silicato inject --to <id> ...`
 - Normal mode: direct send after transcription without local transcript echo
 - Preview mode: review/edit/retry/skip/quit before send
 - Runtime diagnostics via `silicato --doctor`
@@ -120,7 +124,7 @@ Interactive turn controls:
 Optional tuning:
 - `--silence-stop-seconds <seconds>` adjusts pause length before auto-stop (default `1.4`).
 - `--silence-rms-threshold <value>` adjusts speech sensitivity for auto-stop (default `80`).
-- Set `--silence-stop-seconds 0` to disable auto-stop and require manual Enter stop.
+- Set `--silence-stop-seconds 0` to disable silence-based stop; manual Enter remains primary stop and the fixed max-duration fallback still prevents hangs.
 
 Hot tip:
 - If Silicato cuts you off too early, first try `--silence-rms-threshold 60` or `--silence-rms-threshold 40`.
@@ -142,6 +146,21 @@ silicato -p
 
 Normal mode sends directly after transcription and does not print the transcript locally.
 Preview mode requires explicit confirmation and shows transcript text for review.
+
+Manage named routes:
+
+```bash
+silicato route add gaia codex:0.1
+silicato route list
+silicato route check gaia
+```
+
+Inject directly to a named route:
+
+```bash
+silicato inject --to gaia --text "status check"
+silicato inject --to gaia --from-file ./prompt.txt
+```
 
 ## Known Issues
 
