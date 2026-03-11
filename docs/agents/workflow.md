@@ -85,3 +85,23 @@ Canonical check matrix:
 4. Quality agent runs `make gate` and reviews architecture fit.
 5. Docs agent updates affected docs, and updates specs only when creating a new plan.
 6. Merge only after required signoffs.
+
+## Ralph Loop Option
+
+For bounded multi-track work that benefits from parallel implementation plus mandatory integration, use the Ralph-loop prompt pack:
+
+- [Ralph Loop Overview](ralph-loop.md)
+- `.codex/agents/silicato-ralph-loop-controller.md`
+- `.codex/agents/silicato-worker-pane-routing.md`
+- `.codex/agents/silicato-worker-auto-stop-unification.md`
+- `.codex/agents/silicato-merger.md`
+
+Use it when:
+- the objective can be split into parallel-safe tracks
+- conflict zones are known up front
+- a dedicated merger pass will own shared CLI/docs/rule integration
+
+Do not use it when:
+- both tracks must heavily edit the same files from the start
+- no one owns the merger step
+- the scope is small enough that parallelism would cost more than it saves

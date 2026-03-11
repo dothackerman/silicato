@@ -33,6 +33,9 @@ tests/fixtures/auto_stop/local/
 .env.*
 !.env.example
 
+# Local Ralph loop state
+.codex/ralph-loop.local.md
+
 # Editor/OS noise
 .vscode/
 .idea/
