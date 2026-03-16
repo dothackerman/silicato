@@ -2,7 +2,7 @@
 
 Silicato is a Linux voice bridge from push-to-talk microphone input to a selected AI-agent tmux pane.
 
-Current release candidate: `0.1.0rc6`.
+Current release candidate: `0.1.0rc7`.
 
 ## At A Glance
 
@@ -38,7 +38,7 @@ pipx install silicato
 ### I want to use the current RC (`pipx`)
 
 ```bash
-pipx install silicato==0.1.0rc6
+pipx install silicato==0.1.0rc7
 ```
 
 ### I want to clone and run from source

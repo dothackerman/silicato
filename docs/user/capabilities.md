@@ -1,6 +1,6 @@
 # Capabilities
 
-## RC6 scope (`0.1.0rc6`)
+## RC7 scope (`0.1.0rc7`)
 
 In scope:
 - Push-to-talk speech capture with Enter start and auto-stop on long pause (manual Enter stop remains available, tuned default: `1.4s` pause and RMS threshold `80`)
