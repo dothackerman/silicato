@@ -86,7 +86,9 @@ This removes local state files if present:
 
 ## Known issue note: submit timing in tmux agent pane
 
-Silicato mitigates missed submits by splitting text send and Enter into separate tmux operations with a short delay.
+Silicato mitigates missed submits by splitting text send and submit key into separate tmux operations with a conservative 250ms delay.
+If the target pane is still loading environment state, Silicato waits briefly before sending.
+Silicato also fails fast if the target pane is already busy (for example showing `Thinking ... ctrl+q enqueue`) so users can retry after the current turn completes.
 
 If the symptom persists (text appears but prompt does not submit), include these details in bug reports:
 - OS version

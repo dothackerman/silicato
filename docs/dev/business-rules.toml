@@ -168,12 +168,16 @@ tests = [
 
 [[rule]]
 id = "BR-TMUX-002"
-statement = "Tmux sender submits prompts using split text and delayed Enter to avoid terminal agent TUI submit misses."
+statement = "Tmux sender guards against busy agent panes and submits prompts using split text and delayed Enter to avoid terminal agent TUI submit misses."
 owner_layer = "adapters"
 requires_hardware = false
 tests = [
   "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_sends_message",
   "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_raises_on_submit_key_failure",
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_raises_when_target_is_busy",
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_waits_for_environment_load_before_sending",
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_raises_when_environment_stays_loading",
+  "tests/contracts/test_sender_contract.py::test_tmux_sender_contract_waits_for_blank_startup_snapshot",
 ]
 
 [[rule]]

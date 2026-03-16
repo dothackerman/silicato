@@ -143,7 +143,8 @@ Useful tuning:
 ### Agent submit timing in tmux
 
 Status:
-- Silicato mitigates this by splitting text send and submit key send with a short delay.
+- Silicato mitigates this by splitting text send and submit key send with a conservative 250ms delay.
+- Silicato also fails fast when the target pane is already busy (for example `Thinking ... ctrl+q enqueue`) so sends are not reported as successful when the agent cannot submit yet.
 - The issue has been observed with terminal agent UIs in tmux on Linux.
 
 Symptom:
@@ -151,8 +152,9 @@ Symptom:
 
 Current mitigation in Silicato:
 1. Send transcript text first.
-2. Wait briefly.
+2. If the agent pane is still loading, wait briefly until it is ready.
 3. Send Enter as a separate tmux operation.
+4. Fail fast if the pane is already busy processing another request.
 
 If you still see this behavior, open a bug report and include:
 - OS distribution and version
