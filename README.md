@@ -1,3 +1,5 @@
+> **Archived — 2026-10-30.** This project is no longer maintained. Source and history are retained for reference.
+
 # Silicato
 
 Silicato is a Linux voice bridge from push-to-talk microphone input to a selected AI-agent tmux pane.

@@ -14,7 +14,7 @@ Make one shared incremental auto-stop detector the source of truth for both live
 
 ## Frozen seam
 
-1. Stop-policy ownership moves to one shared incremental detector in [`src/silicato/domain/auto_stop.py`](/home/oriol/Projects/private/silicato/src/silicato/domain/auto_stop.py).
+1. Stop-policy ownership moves to one shared incremental detector in [`src/silicato/domain/auto_stop.py`](../src/silicato/domain/auto_stop.py).
 2. Live ALSA capture feeds PCM chunks or RMS frames into that detector instead of implementing its own silence policy.
 3. Offline evaluation reuses the same detector core rather than maintaining a separate decision path.
 4. The existing audio capture port surface should stay stable in Wave 1 unless a smaller-safe change proves impossible.
@@ -32,12 +32,12 @@ Make one shared incremental auto-stop detector the source of truth for both live
 
 ### Application
 
-- [`src/silicato/application/auto_stop_evaluation.py`](/home/oriol/Projects/private/silicato/src/silicato/application/auto_stop_evaluation.py) must feed prerecorded WAV frames through the shared detector path.
+- [`src/silicato/application/auto_stop_evaluation.py`](../src/silicato/application/auto_stop_evaluation.py) must feed prerecorded WAV frames through the shared detector path.
 - Evaluation scoring remains application-owned, but detector semantics come from the domain source of truth.
 
 ### Adapters
 
-- [`src/silicato/adapters/audio/alsa_capture.py`](/home/oriol/Projects/private/silicato/src/silicato/adapters/audio/alsa_capture.py) stays responsible for microphone I/O, chunk reads, WAV persistence, and manual Enter interruption.
+- [`src/silicato/adapters/audio/alsa_capture.py`](../src/silicato/adapters/audio/alsa_capture.py) stays responsible for microphone I/O, chunk reads, WAV persistence, and manual Enter interruption.
 - It must stop delegating silence policy to adapter-local timers and RMS rules once the shared detector exists.
 - If max-duration fallback triggers during live capture, the runtime must explain that stop reason explicitly.
 

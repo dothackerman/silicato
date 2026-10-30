@@ -24,7 +24,7 @@ Add named pane routing as a core Silicato feature, not as a runtime plugin.
 
 ### Ports
 
-- Extend [`src/silicato/ports/storage.py`](/home/oriol/Projects/private/silicato/src/silicato/ports/storage.py) with route-oriented value objects and a dedicated `RouteStorePort`.
+- Extend [`src/silicato/ports/storage.py`](../src/silicato/ports/storage.py) with route-oriented value objects and a dedicated `RouteStorePort`.
 - Route identifiers are validated in application logic, not in CLI parsing.
 - Identifier format for MVP: `[a-z0-9_-]+`.
 
